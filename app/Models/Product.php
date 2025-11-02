@@ -18,22 +18,30 @@ class Product extends Model implements HasMedia
         'slug',
         'description',
         'benefits',
-        'certifications',
-        'category_id',
+        'usage_instructions',
+        'is_halal_certified',
+        'is_bpom_certified',
+        'is_natural',
+        'product_category_id',
         'price',
-        'status',
-        'featured',
+        'stock_quantity',
+        'is_active',
+        'is_featured',
     ];
 
     protected $casts = [
-        'certifications' => 'array',
         'price' => 'decimal:2',
-        'featured' => 'boolean',
+        'stock_quantity' => 'integer',
+        'is_active' => 'boolean',
+        'is_featured' => 'boolean',
+        'is_halal_certified' => 'boolean',
+        'is_bpom_certified' => 'boolean',
+        'is_natural' => 'boolean',
     ];
 
     public function category()
     {
-        return $this->belongsTo(ProductCategory::class, 'category_id');
+        return $this->belongsTo(ProductCategory::class, 'product_category_id');
     }
 
     public function registerMediaCollections(): void

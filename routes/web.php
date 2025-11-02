@@ -33,5 +33,33 @@ Route::middleware('auth')->group(function () {
     // Admin routes
     Route::prefix('admin')->name('admin.')->middleware('role:Super Admin|Admin|Marketing')->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
+
+        // Products management (Super Admin, Admin)
+        Route::middleware('role:Super Admin|Admin')->group(function () {
+            Route::resource('products', \App\Modules\Admin\Controllers\ProductController::class);
+            Route::delete('products/{product}/images/{mediaId}', [\App\Modules\Admin\Controllers\ProductController::class, 'removeImage'])->name('products.remove-image');
+        });
+
+        // Articles management (Super Admin, Admin, Marketing)
+        Route::resource('articles', \App\Modules\Admin\Controllers\ArticleController::class)->middleware('role:Super Admin|Admin|Marketing');
+
+        // Contacts management (Super Admin, Admin)
+        Route::middleware('role:Super Admin|Admin')->group(function () {
+            Route::get('contacts', [\App\Modules\Admin\Controllers\ContactController::class, 'index'])->name('contacts.index');
+            Route::get('contacts/{contact}', [\App\Modules\Admin\Controllers\ContactController::class, 'show'])->name('contacts.show');
+            Route::put('contacts/{contact}', [\App\Modules\Admin\Controllers\ContactController::class, 'update'])->name('contacts.update');
+            Route::delete('contacts/{contact}', [\App\Modules\Admin\Controllers\ContactController::class, 'destroy'])->name('contacts.destroy');
+        });
+
+        // Chatbot management (Super Admin, Admin)
+        Route::middleware('role:Super Admin|Admin')->group(function () {
+            Route::resource('chatbot', \App\Modules\Admin\Controllers\ChatbotController::class, ['except' => ['show']]);
+            Route::get('chatbot-history', [\App\Modules\Admin\Controllers\ChatbotController::class, 'history'])->name('chatbot.history');
+        });
+
+        // Chatbot read-only access for Marketing
+        Route::middleware('role:Marketing')->group(function () {
+            Route::get('chatbot-history', [\App\Modules\Admin\Controllers\ChatbotController::class, 'history'])->name('chatbot.history');
+        });
     });
 });

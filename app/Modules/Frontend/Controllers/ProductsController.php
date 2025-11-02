@@ -19,6 +19,9 @@ class ProductsController extends Controller
             $query->where('product_category_id', $request->category);
         }
 
+        // Only show active products
+        $query->where('is_active', true);
+
         // Search functionality
         if ($request->has('search') && $request->search) {
             $query->where('name', 'like', '%' . $request->search . '%')

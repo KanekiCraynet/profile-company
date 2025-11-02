@@ -16,6 +16,11 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(RolePermissionSeeder::class);
+        $this->call(ChatbotRuleSeeder::class);
+        $this->call(ProductCategorySeeder::class);
+        $this->call(ArticleCategorySeeder::class);
+        $this->call(ProductSeeder::class);
+        $this->call(ArticleSeeder::class);
 
         // Create Super Admin user
         $superAdmin = User::firstOrCreate([
