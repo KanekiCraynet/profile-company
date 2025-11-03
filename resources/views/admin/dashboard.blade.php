@@ -2,9 +2,9 @@
     <x-slot name="title">Dashboard</x-slot>
 
     <!-- Statistics Cards -->
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 mb-8">
         @can('view products')
-        <div class="bg-white p-6 rounded-lg shadow-md">
+        <div class="bg-white p-6 rounded-lg shadow-md hover:shadow-lg transition-shadow">
             <div class="flex items-center">
                 <div class="p-3 bg-green-100 rounded-full">
                     <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -12,8 +12,9 @@
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Total Products</h3>
-                    <p class="text-2xl font-bold text-green-600">{{ \App\Models\Product::count() }}</p>
+                    <h3 class="text-sm font-medium text-gray-600">Total Products</h3>
+                    <p class="text-2xl font-bold text-green-600">{{ $stats['total_products'] ?? 0 }}</p>
+                    <p class="text-xs text-gray-500 mt-1">{{ $stats['active_products'] ?? 0 }} active</p>
                 </div>
             </div>
         </div>
@@ -28,8 +29,9 @@
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Total Articles</h3>
-                    <p class="text-2xl font-bold text-blue-600">{{ \App\Models\Article::count() }}</p>
+                    <h3 class="text-sm font-medium text-gray-600">Total Articles</h3>
+                    <p class="text-2xl font-bold text-blue-600">{{ $stats['total_articles'] ?? 0 }}</p>
+                    <p class="text-xs text-gray-500 mt-1">{{ $stats['published_articles'] ?? 0 }} published</p>
                 </div>
             </div>
         </div>
@@ -44,8 +46,9 @@
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <h3 class="text-lg font-semibold text-gray-900">New Contacts</h3>
-                    <p class="text-2xl font-bold text-yellow-600">{{ \App\Models\Contact::where('status', 'unread')->count() }}</p>
+                    <h3 class="text-sm font-medium text-gray-600">New Contacts</h3>
+                    <p class="text-2xl font-bold text-yellow-600">{{ $stats['unread_contacts'] ?? 0 }}</p>
+                    <p class="text-xs text-gray-500 mt-1">{{ $stats['total_contacts'] ?? 0 }} total</p>
                 </div>
             </div>
         </div>
@@ -60,8 +63,9 @@
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Chat Sessions</h3>
-                    <p class="text-2xl font-bold text-purple-600">{{ \App\Models\ChatHistory::whereDate('created_at', today())->count() }}</p>
+                    <h3 class="text-sm font-medium text-gray-600">Today's Chats</h3>
+                    <p class="text-2xl font-bold text-purple-600">{{ $stats['today_chats'] ?? 0 }}</p>
+                    <p class="text-xs text-gray-500 mt-1">Chat sessions today</p>
                 </div>
             </div>
         </div>
@@ -77,11 +81,7 @@
                 <h3 class="text-lg font-semibold text-gray-900">Recent Contacts</h3>
             </div>
             <div class="p-6">
-                @php
-                    $recentContacts = \App\Models\Contact::orderBy('created_at', 'desc')->limit(5)->get();
-                @endphp
-
-                @if($recentContacts->count() > 0)
+                @if(isset($recentContacts) && $recentContacts->count() > 0)
                     <div class="space-y-4">
                         @foreach($recentContacts as $contact)
                         <div class="flex items-center justify-between">
@@ -93,7 +93,7 @@
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
                                 {{ $contact->status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                                    ($contact->status === 'responded' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800') }}">
-                                {{ ucfirst($contact->status) }}
+                                {{ ucfirst($contact->status ?? 'unread') }}
                             </span>
                         </div>
                         @endforeach
@@ -117,22 +117,18 @@
                 <h3 class="text-lg font-semibold text-gray-900">Recent Articles</h3>
             </div>
             <div class="p-6">
-                @php
-                    $recentArticles = \App\Models\Article::with('author')->orderBy('created_at', 'desc')->limit(5)->get();
-                @endphp
-
-                @if($recentArticles->count() > 0)
+                @if(isset($recentArticles) && $recentArticles->count() > 0)
                     <div class="space-y-4">
                         @foreach($recentArticles as $article)
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="font-medium text-gray-900">{{ Str::limit($article->title, 30) }}</p>
+                                <p class="font-medium text-gray-900">{{ \Illuminate\Support\Str::limit($article->title, 30) }}</p>
                                 <p class="text-sm text-gray-600">By {{ $article->author->name ?? 'Unknown' }}</p>
                                 <p class="text-xs text-gray-500">{{ $article->created_at->diffForHumans() }}</p>
                             </div>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                {{ $article->status === 'published' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-                                {{ ucfirst($article->status) }}
+                                {{ ($article->is_published ?? false) || ($article->status ?? 'draft') === 'published' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                                {{ ($article->is_published ?? false) || ($article->status ?? 'draft') === 'published' ? 'Published' : 'Draft' }}
                             </span>
                         </div>
                         @endforeach

@@ -22,8 +22,11 @@ class ArticleRepository extends BaseRepository
     public function getPublishedArticles()
     {
         return $this->model
-            ->where('status', 'published')
-            ->where('published_at', '<=', now())
+            ->where('is_published', true)
+            ->where(function ($query) {
+                $query->where('published_at', '<=', now())
+                      ->orWhereNull('published_at');
+            })
             ->orderBy('published_at', 'desc')
             ->get();
     }
@@ -38,8 +41,11 @@ class ArticleRepository extends BaseRepository
     {
         return $this->model
             ->where('slug', $slug)
-            ->where('status', 'published')
-            ->where('published_at', '<=', now())
+            ->where('is_published', true)
+            ->where(function ($query) {
+                $query->where('published_at', '<=', now())
+                      ->orWhereNull('published_at');
+            })
             ->first();
     }
 
@@ -52,9 +58,12 @@ class ArticleRepository extends BaseRepository
     public function getFeaturedArticles(int $limit = 3)
     {
         return $this->model
-            ->where('status', 'published')
+            ->where('is_published', true)
             ->where('featured', true)
-            ->where('published_at', '<=', now())
+            ->where(function ($query) {
+                $query->where('published_at', '<=', now())
+                      ->orWhereNull('published_at');
+            })
             ->orderBy('published_at', 'desc')
             ->limit($limit)
             ->get();
@@ -69,8 +78,11 @@ class ArticleRepository extends BaseRepository
     public function getLatestArticles(int $limit = 6)
     {
         return $this->model
-            ->where('status', 'published')
-            ->where('published_at', '<=', now())
+            ->where('is_published', true)
+            ->where(function ($query) {
+                $query->where('published_at', '<=', now())
+                      ->orWhereNull('published_at');
+            })
             ->orderBy('published_at', 'desc')
             ->limit($limit)
             ->get();
@@ -86,8 +98,11 @@ class ArticleRepository extends BaseRepository
     {
         return $this->model
             ->where('category_id', $categoryId)
-            ->where('status', 'published')
-            ->where('published_at', '<=', now())
+            ->where('is_published', true)
+            ->where(function ($query) {
+                $query->where('published_at', '<=', now())
+                      ->orWhereNull('published_at');
+            })
             ->orderBy('published_at', 'desc')
             ->get();
     }
@@ -105,8 +120,11 @@ class ArticleRepository extends BaseRepository
     {
         $query = $this->model
             ->where('id', '!=', $articleId)
-            ->where('status', 'published')
-            ->where('published_at', '<=', now());
+            ->where('is_published', true)
+            ->where(function ($query) {
+                $query->where('published_at', '<=', now())
+                      ->orWhereNull('published_at');
+            });
 
         // Prioritize same category
         $query->where(function ($q) use ($categoryId, $tagIds) {

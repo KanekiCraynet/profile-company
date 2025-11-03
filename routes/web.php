@@ -20,8 +20,13 @@ Route::get('/about', [PagesController::class, 'about'])->name('about');
 Route::get('/contact', [PagesController::class, 'contact'])->name('contact');
 Route::post('/contact', [PagesController::class, 'storeContact'])->name('contact.store');
 
+<<<<<<< Current (Your changes)
 // API Routes
 Route::post('/api/chatbot', [ChatbotController::class, 'handleMessage'])->name('api.chatbot');
+=======
+// Chatbot API route (public)
+Route::post('/chatbot/message', [\App\Modules\Chatbot\Controllers\ChatbotController::class, 'handleMessage'])->name('chatbot.message');
+>>>>>>> Incoming (Background Agent changes)
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {

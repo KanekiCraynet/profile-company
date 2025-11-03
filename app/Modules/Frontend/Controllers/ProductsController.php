@@ -3,20 +3,18 @@
 namespace App\Modules\Frontend\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Repositories\ProductRepository;
-use App\Models\Product;
+use App\Services\ProductService;
 use App\Models\ProductCategory;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\View;
+use Illuminate\Support\Str;
 
 class ProductsController extends Controller
 {
-    protected $productRepository;
-
-    public function __construct(ProductRepository $productRepository)
-    {
-        $this->productRepository = $productRepository;
-    }
+    public function __construct(
+        protected ProductService $productService
+    ) {}
 
     /**
      * Display a listing of products with filtering and search.
@@ -26,7 +24,7 @@ class ProductsController extends Controller
         $cacheKey = 'products.index.' . md5(json_encode($request->all()));
         
         $data = Cache::remember($cacheKey, 1800, function () use ($request) {
-            $query = Product::with(['category', 'media'])
+            $query = \App\Models\Product::with(['category', 'media'])
                 ->where('is_active', true);
 
             // Filter by category
@@ -67,6 +65,19 @@ class ProductsController extends Controller
             ];
         });
 
+        // SEO Meta Tags
+        $seoMeta = [
+            'title' => 'Our Products - Premium Herbal & Food Products | PT Lestari Jaya Bangsa',
+            'description' => 'Explore our premium herbal and processed food products. 100% natural, Halal certified, and BPOM approved products for your health.',
+            'keywords' => 'herbal products, food products, halal certified, BPOM approved, natural products',
+            'og_title' => 'Our Products - PT Lestari Jaya Bangsa',
+            'og_description' => 'Discover premium herbal and processed food products',
+            'og_type' => 'website',
+            'og_image' => asset('images/logo.png'),
+        ];
+
+        View::share('seoMeta', $seoMeta);
+
         return view('frontend.products.index', $data);
     }
 
@@ -75,27 +86,53 @@ class ProductsController extends Controller
      */
     public function show($slug)
     {
-        $cacheKey = 'product.show.' . $slug;
+        $product = $this->productService->getBySlug($slug);
         
-        $data = Cache::remember($cacheKey, 3600, function () use ($slug) {
-            $product = Product::with(['category', 'media'])
-                ->where('slug', $slug)
-                ->where('is_active', true)
-                ->firstOrFail();
+        if (!$product) {
+            abort(404);
+        }
 
-            // Get related products from same category using repository
-            $relatedProducts = $this->productRepository->getRelatedProducts(
-                $product->id,
-                $product->product_category_id,
-                4
-            );
+        $relatedProducts = $this->productService->getRelatedProducts($product, 4);
 
-            return [
-                'product' => $product,
-                'relatedProducts' => $relatedProducts,
-            ];
-        });
+        // SEO Meta Tags
+        $seoMeta = [
+            'title' => $product->meta_title ?? ($product->name . ' - PT Lestari Jaya Bangsa'),
+            'description' => $product->meta_description ?? Str::limit(strip_tags($product->description), 160),
+            'keywords' => $product->name . ', herbal products, food products',
+            'og_title' => $product->name,
+            'og_description' => Str::limit(strip_tags($product->description), 160),
+            'og_type' => 'product',
+            'og_image' => $product->getFirstMediaUrl('images') ?: asset('images/logo.png'),
+            'json_ld' => $this->generateProductJsonLd($product),
+        ];
 
-        return view('frontend.products.show', $data);
+        View::share('seoMeta', $seoMeta);
+
+        return view('frontend.products.show', compact('product', 'relatedProducts'));
+    }
+
+    /**
+     * Generate JSON-LD structured data for product.
+     */
+    protected function generateProductJsonLd($product): array
+    {
+        return [
+            '@context' => 'https://schema.org',
+            '@type' => 'Product',
+            'name' => $product->name,
+            'description' => strip_tags($product->description),
+            'image' => $product->getFirstMediaUrl('images') ?: asset('images/logo.png'),
+            'brand' => [
+                '@type' => 'Brand',
+                'name' => 'PT Lestari Jaya Bangsa',
+            ],
+            'offers' => [
+                '@type' => 'Offer',
+                'price' => $product->price ?? '0',
+                'priceCurrency' => 'IDR',
+                'availability' => $product->stock_quantity > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+            ],
+            'category' => $product->category->name ?? '',
+        ];
     }
 }

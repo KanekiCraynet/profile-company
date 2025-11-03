@@ -5,9 +5,14 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
-    <title>{{ $title ?? config('app.name', 'PT Lestari Jaya Bangsa') }}</title>
+    @php
+        $seoMeta = $seoMeta ?? [];
+    @endphp
+
+    <title>{{ $seoMeta['title'] ?? ($title ?? config('app.name', 'PT Lestari Jaya Bangsa')) }}</title>
 
     <!-- SEO Meta Tags -->
+<<<<<<< Current (Your changes)
     <meta name="description" content="{{ $metaDescription ?? 'PT Lestari Jaya Bangsa provides high-quality herbal and processed food products, committed to prioritizing both health and taste.' }}">
     <meta name="keywords" content="{{ $metaKeywords ?? 'herbal products, food products, natural ingredients, BPOM certified, Halal MUI' }}">
     <link rel="canonical" href="{{ url()->current() }}">
@@ -19,6 +24,30 @@
     <meta property="og:url" content="{{ url()->current() }}">
     @if(isset($ogImage))
     <meta property="og:image" content="{{ $ogImage }}">
+=======
+    <meta name="description" content="{{ $seoMeta['description'] ?? 'PT Lestari Jaya Bangsa provides high-quality herbal and processed food products, committed to prioritizing both health and taste.' }}">
+    <meta name="keywords" content="{{ $seoMeta['keywords'] ?? 'herbal products, food products, natural ingredients, BPOM certified, Halal MUI' }}">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="{{ $seoMeta['og_title'] ?? ($title ?? config('app.name', 'PT Lestari Jaya Bangsa')) }}">
+    <meta property="og:description" content="{{ $seoMeta['og_description'] ?? 'PT Lestari Jaya Bangsa provides high-quality herbal and processed food products.' }}">
+    <meta property="og:type" content="{{ $seoMeta['og_type'] ?? 'website' }}">
+    @if(isset($seoMeta['og_image']))
+    <meta property="og:image" content="{{ $seoMeta['og_image'] }}">
+    @endif
+    @if(isset($seoMeta['article_published_time']))
+    <meta property="article:published_time" content="{{ $seoMeta['article_published_time'] }}">
+    @endif
+    @if(isset($seoMeta['article_author']))
+    <meta property="article:author" content="{{ $seoMeta['article_author'] }}">
+    @endif
+
+    <!-- JSON-LD Structured Data -->
+    @if(isset($seoMeta['json_ld']))
+    <script type="application/ld+json">
+        {!! json_encode($seoMeta['json_ld']) !!}
+    </script>
+>>>>>>> Incoming (Background Agent changes)
     @endif
 
     <!-- Fonts -->
@@ -50,24 +79,53 @@
                     </a>
                 </div>
 
-                <div class="hidden md:flex items-center space-x-8">
-                    <a href="{{ route('home') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('home') ? 'text-green-600' : '' }}">Home</a>
-                    <a href="{{ route('products.index') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('products.*') ? 'text-green-600' : '' }}">Products</a>
-                    <a href="{{ route('about') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('about') ? 'text-green-600' : '' }}">About</a>
-                    <a href="{{ route('articles.index') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('articles.*') ? 'text-green-600' : '' }}">Articles</a>
-                    <a href="{{ route('contact') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium {{ request()->routeIs('contact') ? 'text-green-600' : '' }}">Contact</a>
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button type="button" id="mobile-menu-button" class="text-gray-700 hover:text-green-600 focus:outline-none focus:text-green-600">
+                        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+                        </svg>
+                    </button>
                 </div>
 
-                <div class="flex items-center">
+                <!-- Desktop Navigation -->
+                <div class="hidden md:flex items-center space-x-8">
+                    <a href="{{ route('home') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('home') ? 'text-green-600 font-semibold' : '' }}">Home</a>
+                    <a href="{{ route('products.index') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('products.*') ? 'text-green-600 font-semibold' : '' }}">Products</a>
+                    <a href="{{ route('about') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('about') ? 'text-green-600 font-semibold' : '' }}">About</a>
+                    <a href="{{ route('articles.index') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('articles.*') ? 'text-green-600 font-semibold' : '' }}">Articles</a>
+                    <a href="{{ route('contact') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors {{ request()->routeIs('contact') ? 'text-green-600 font-semibold' : '' }}">Contact</a>
+                </div>
+
+                <!-- Desktop Auth Button -->
+                <div class="hidden md:flex items-center">
                     @auth
-                        <a href="{{ route('admin.dashboard') }}" class="bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700">Dashboard</a>
+                        <a href="{{ route('admin.dashboard') }}" class="bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700 transition-colors">Dashboard</a>
                     @else
-                        <a href="{{ route('login') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium">Login</a>
+                        <a href="{{ route('login') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Login</a>
                     @endauth
                 </div>
             </div>
         </div>
     </nav>
+
+    <!-- Mobile Menu -->
+    <div id="mobile-menu" class="hidden md:hidden bg-white border-t border-gray-200">
+        <div class="px-4 pt-2 pb-3 space-y-1">
+            <a href="{{ route('home') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50 {{ request()->routeIs('home') ? 'text-green-600 bg-green-50' : '' }}">Home</a>
+            <a href="{{ route('products.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50 {{ request()->routeIs('products.*') ? 'text-green-600 bg-green-50' : '' }}">Products</a>
+            <a href="{{ route('about') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50 {{ request()->routeIs('about') ? 'text-green-600 bg-green-50' : '' }}">About</a>
+            <a href="{{ route('articles.index') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50 {{ request()->routeIs('articles.*') ? 'text-green-600 bg-green-50' : '' }}">Articles</a>
+            <a href="{{ route('contact') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50 {{ request()->routeIs('contact') ? 'text-green-600 bg-green-50' : '' }}">Contact</a>
+            <div class="border-t border-gray-200 pt-2 mt-2">
+                @auth
+                    <a href="{{ route('admin.dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium bg-green-600 text-white hover:bg-green-700">Dashboard</a>
+                @else
+                    <a href="{{ route('login') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50">Login</a>
+                @endauth
+            </div>
+        </div>
+    </div>
 
     <!-- Main Content -->
     <main>
@@ -152,6 +210,16 @@
     <script src="//unpkg.com/alpinejs" defer></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu toggle
+            const mobileMenuButton = document.getElementById('mobile-menu-button');
+            const mobileMenu = document.getElementById('mobile-menu');
+            if (mobileMenuButton && mobileMenu) {
+                mobileMenuButton.addEventListener('click', function() {
+                    mobileMenu.classList.toggle('hidden');
+                });
+            }
+
+            // Chatbot functionality
             const chatbotButton = document.getElementById('chatbot-button');
             const chatbotWindow = document.getElementById('chatbot-window');
             const chatInput = document.getElementById('chat-input');
@@ -174,18 +242,36 @@
                 addMessage(message, 'user');
                 chatInput.value = '';
 
+                // Get or create session ID
+                let sessionId = localStorage.getItem('chatbot_session_id');
+                if (!sessionId) {
+                    sessionId = 'chat_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+                    localStorage.setItem('chatbot_session_id', sessionId);
+                }
+
                 // Send to backend and get response
-                fetch('/api/chatbot', {
+                fetch('{{ route("chatbot.message") }}', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                         'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
                     },
-                    body: JSON.stringify({ message: message })
+                    body: JSON.stringify({ 
+                        message: message,
+                        session_id: sessionId
+                    })
                 })
                 .then(response => response.json())
                 .then(data => {
-                    addMessage(data.response, 'bot');
+                    if (data.success) {
+                        addMessage(data.response, 'bot');
+                        // Update session ID if provided
+                        if (data.session_id) {
+                            localStorage.setItem('chatbot_session_id', data.session_id);
+                        }
+                    } else {
+                        addMessage(data.response || 'Sorry, I encountered an error. Please try again.', 'bot');
+                    }
                 })
                 .catch(error => {
                     addMessage('Sorry, I encountered an error. Please try again.', 'bot');

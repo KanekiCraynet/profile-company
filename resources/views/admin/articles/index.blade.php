@@ -18,7 +18,7 @@
                        class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
             </div>
 
-            <div class="w-48">
+            <div class="w-full sm:w-48">
                 <select name="status" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     <option value="">All Status</option>
                     <option value="published" {{ request('status') == 'published' ? 'selected' : '' }}>Published</option>
@@ -26,7 +26,7 @@
                 </select>
             </div>
 
-            <div class="w-48">
+            <div class="w-full sm:w-48">
                 <select name="category" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                     <option value="">All Categories</option>
                     @foreach($categories as $category)
@@ -79,7 +79,7 @@
                         <td class="px-6 py-4">
                             <div class="flex items-center">
                                 @if($article->featured_image)
-                                    <img class="h-12 w-12 rounded-lg object-cover mr-3" src="{{ asset('uploads/' . $article->featured_image) }}" alt="{{ $article->title }}">
+                                    <img class="h-12 w-12 rounded-lg object-cover mr-3" src="{{ asset('storage/' . $article->featured_image) }}" alt="{{ $article->title }}">
                                 @else
                                     <div class="h-12 w-12 rounded-lg bg-gray-200 flex items-center justify-center mr-3">
                                         <span class="text-gray-400 text-xs">No img</span>
@@ -87,7 +87,7 @@
                                 @endif
                                 <div>
                                     <div class="text-sm font-medium text-gray-900">{{ $article->title }}</div>
-                                    <div class="text-sm text-gray-500">{{ Str::limit(strip_tags($article->excerpt ?? $article->content ?? ''), 50) }}</div>
+                                    <div class="text-sm text-gray-500">{{ \Illuminate\Support\Str::limit(strip_tags($article->excerpt ?? $article->content ?? ''), 50) }}</div>
                                     @if($article->featured)
                                         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800 mt-1">
                                             Featured
@@ -104,8 +104,8 @@
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                {{ $article->status === 'published' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-                                {{ ucfirst($article->status) }}
+                                {{ ($article->is_published ?? false) ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                                {{ ($article->is_published ?? false) ? 'Published' : 'Draft' }}
                             </span>
                         </td>
                         <td class="px-6 py-4 whitespace-nowrap">

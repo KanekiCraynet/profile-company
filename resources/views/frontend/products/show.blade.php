@@ -1,6 +1,6 @@
 <x-frontend-layout>
     <x-slot name="title">{{ $product->name }} - Products | PT Lestari Jaya Bangsa</x-slot>
-    <x-slot name="metaDescription">{{ Str::limit(strip_tags($product->description ?? ''), 160) }}</x-slot>
+    <x-slot name="metaDescription">{{ \Illuminate\Support\Str::limit(strip_tags($product->description ?? ''), 160) }}</x-slot>
 
     <!-- Schema.org Product Markup -->
     <script type="application/ld+json">
@@ -81,14 +81,16 @@
 
                 <!-- Additional Images Gallery -->
                 @if($product->getMedia('images')->count() > 1)
-                    <div class="grid grid-cols-4 gap-2">
+                    <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
                         @foreach($product->getMedia('images') as $index => $media)
-                            <img src="{{ $media->getUrl() }}" 
-                                 alt="{{ $product->name }} - Image {{ $index + 1 }}" 
-                                 class="w-full h-20 object-cover rounded cursor-pointer hover:opacity-80 border-2 {{ $index === 0 ? 'border-green-500' : 'border-transparent' }}"
-                                 onclick="changeMainImage('{{ $media->getUrl() }}', this)"
-                                 onmouseover="this.style.borderColor='#22c55e'"
-                                 onmouseout="if(this !== document.querySelector('.border-green-500')) this.style.borderColor='transparent'">
+                            <button type="button" 
+                                    onclick="changeMainImage('{{ $media->getUrl() }}', this)"
+                                    class="focus:outline-none focus:ring-2 focus:ring-green-500 rounded overflow-hidden">
+                                <img src="{{ $media->getUrl() }}" 
+                                     alt="{{ $product->name }} - Image {{ $index + 1 }}" 
+                                     class="w-full h-16 sm:h-20 object-cover rounded cursor-pointer hover:opacity-80 border-2 transition-all {{ $index === 0 ? 'border-green-500' : 'border-transparent hover:border-green-300' }}"
+                                     loading="lazy">
+                            </button>
                         @endforeach
                     </div>
                 @endif
@@ -96,14 +98,22 @@
 
             <script>
                 function changeMainImage(imageUrl, thumbElement) {
-                    document.getElementById('main-product-image').src = imageUrl;
+                    const mainImage = document.getElementById('main-product-image');
+                    if (mainImage) {
+                        mainImage.src = imageUrl;
+                    }
                     // Update border on thumbnails
-                    document.querySelectorAll('.grid img').forEach(img => {
-                        img.classList.remove('border-green-500');
-                        img.classList.add('border-transparent');
-                    });
-                    thumbElement.classList.remove('border-transparent');
-                    thumbElement.classList.add('border-green-500');
+                    if (thumbElement && thumbElement.querySelector('img')) {
+                        document.querySelectorAll('#main-image-container ~ .grid img').forEach(img => {
+                            img.classList.remove('border-green-500');
+                            img.classList.add('border-transparent');
+                        });
+                        const thumbImg = thumbElement.querySelector('img');
+                        if (thumbImg) {
+                            thumbImg.classList.remove('border-transparent');
+                            thumbImg.classList.add('border-green-500');
+                        }
+                    }
                 }
             </script>
 

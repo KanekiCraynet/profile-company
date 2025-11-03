@@ -19,6 +19,8 @@ class DashboardController extends Controller
      */
     public function index()
     {
+        // Authorization is handled by route middleware
+
         $user = auth()->user();
 
         // Determine dashboard view based on role
@@ -45,7 +47,7 @@ class DashboardController extends Controller
                 'total_products' => Product::count(),
                 'active_products' => Product::where('is_active', true)->count(),
                 'total_articles' => Article::count(),
-                'published_articles' => Article::where('status', 'published')->count(),
+                'published_articles' => Article::where('is_published', true)->count(),
                 'total_contacts' => Contact::count(),
                 'unread_contacts' => Contact::where('status', 'unread')->count(),
                 'today_chats' => ChatHistory::whereDate('created_at', today())->count(),
@@ -71,7 +73,7 @@ class DashboardController extends Controller
                 'active_products' => Product::where('is_active', true)->count(),
                 'featured_products' => Product::where('is_featured', true)->where('is_active', true)->count(),
                 'total_articles' => Article::count(),
-                'published_articles' => Article::where('status', 'published')->count(),
+                'published_articles' => Article::where('is_published', true)->count(),
                 'total_contacts' => Contact::count(),
                 'unread_contacts' => Contact::where('status', 'unread')->count(),
                 'today_chats' => ChatHistory::whereDate('created_at', today())->count(),
@@ -95,9 +97,9 @@ class DashboardController extends Controller
             return [
                 'my_articles' => Article::where('author_id', $user->id)->count(),
                 'published_articles' => Article::where('author_id', $user->id)
-                    ->where('status', 'published')->count(),
+                    ->where('is_published', true)->count(),
                 'draft_articles' => Article::where('author_id', $user->id)
-                    ->where('status', 'draft')->count(),
+                    ->where('is_published', false)->count(),
                 'today_chats' => ChatHistory::whereDate('created_at', today())->count(),
                 'total_chats' => ChatHistory::count(),
             ];

@@ -22,14 +22,17 @@ class Article extends Model
         'tags',
         'featured',
         'is_published',
+        'status',
         'published_at',
         'author_id',
+        'view_count',
     ];
 
     protected $casts = [
         'tags' => 'array',
         'featured' => 'boolean',
         'is_published' => 'boolean',
+        'view_count' => 'integer',
         'published_at' => 'datetime',
     ];
 

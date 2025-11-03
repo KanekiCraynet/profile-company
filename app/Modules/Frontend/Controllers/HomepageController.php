@@ -3,75 +3,67 @@
 namespace App\Modules\Frontend\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Product;
-use App\Models\Article;
-use App\Models\Page;
-use App\Models\Setting;
-use Illuminate\Http\Request;
+use App\Services\ProductService;
+use App\Services\ArticleService;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\View;
 
 class HomepageController extends Controller
 {
-    /**
-     * Display the homepage with dynamic content.
-     */
+    public function __construct(
+        protected ProductService $productService,
+        protected ArticleService $articleService
+    ) {}
+
     public function index()
     {
         // Get featured products with caching (limit to 6)
-        $featuredProducts = Cache::remember('homepage.featured_products', 3600, function () {
-            return Product::with(['media', 'category'])
-                ->where('is_featured', true)
-                ->where('is_active', true)
-                ->orderBy('created_at', 'desc')
-                ->limit(6)
-                ->get();
-        });
+        $featuredProducts = $this->productService->getFeaturedProducts(6);
 
         // Get latest articles with caching (limit to 3)
-        $latestArticles = Cache::remember('homepage.latest_articles', 1800, function () {
-            return Article::with(['category', 'author'])
-                ->where('is_published', true)
-                ->where('published_at', '<=', now())
-                ->orderBy('published_at', 'desc')
-                ->limit(3)
-                ->get();
-        });
+        $latestArticles = $this->articleService->getLatestArticles(3);
 
-        // Get homepage content from pages table with caching
+        // Get homepage content from settings/pages with caching
         $homepageContent = Cache::remember('homepage.content', 3600, function () {
-            return Page::where('slug', 'home')
-                ->where('status', 'active')
-                ->first();
+            return \App\Models\Page::where('slug', 'home')->first();
         });
 
-        // Get company settings for hero section
-        $companyName = Cache::remember('settings.company_name', 3600, function () {
-            return Setting::get('company_name', 'PT Lestari Jaya Bangsa');
-        });
+        // SEO Meta Tags
+        $seoMeta = [
+            'title' => 'Home - PT Lestari Jaya Bangsa | Premium Herbal & Food Products Since 1992',
+            'description' => 'PT Lestari Jaya Bangsa delivers premium herbal and processed food products, combining health and taste in every creation. Established in 1992.',
+            'keywords' => 'herbal products, food products, natural products, halal certified, BPOM approved, PT Lestari Jaya Bangsa',
+            'og_title' => 'PT Lestari Jaya Bangsa - Food & Herbal Products',
+            'og_description' => 'Premium herbal and processed food products, combining health and taste since 1992',
+            'og_type' => 'website',
+            'og_image' => asset('images/logo.png'),
+            'json_ld' => [
+                '@context' => 'https://schema.org',
+                '@type' => 'Organization',
+                'name' => 'PT Lestari Jaya Bangsa',
+                'url' => url('/'),
+                'logo' => asset('images/logo.png'),
+                'description' => 'Premium herbal and processed food products, combining health and taste in every creation',
+                'foundingDate' => '1992',
+                'address' => [
+                    '@type' => 'PostalAddress',
+                    'streetAddress' => 'Jl. Raya Buntu - Sampang, Utara Pasar, Kali Minyak, Bangsa',
+                    'addressLocality' => 'Kec. Kebasen',
+                    'addressRegion' => 'Jawa Tengah',
+                    'postalCode' => '53282',
+                    'addressCountry' => 'ID',
+                ],
+                'contactPoint' => [
+                    '@type' => 'ContactPoint',
+                    'telephone' => '(+62) 821-9698-146',
+                    'contactType' => 'customer service',
+                    'hoursAvailable' => 'Mo-Fr 07:00-16:00',
+                ],
+            ],
+        ];
 
-        $companyTagline = Cache::remember('settings.company_tagline', 3600, function () {
-            return Setting::get('company_tagline', 'Food & Herbal — Health and Flavour, United in One Choice');
-        });
+        View::share('seoMeta', $seoMeta);
 
-        $companyDescription = Cache::remember('settings.company_description', 3600, function () {
-            return Setting::get('company_description', 'PT Lestari Jaya Bangsa provides high-quality herbal and processed food products, committed to prioritising both health and taste. With experience and innovation, the company continues to earn consumer trust while expanding towards the global market.');
-        });
-
-        // SEO meta data
-        $seoTitle = $homepageContent?->meta_title ?? Setting::get('seo_title', $companyName . ' - Food & Herbal Products');
-        $seoDescription = $homepageContent?->meta_description ?? Setting::get('seo_description', $companyDescription);
-        $seoKeywords = Setting::get('seo_keywords', 'herbal, food, natural products, halal, BPOM, PT Lestari Jaya Bangsa');
-
-        return view('frontend.homepage', compact(
-            'featuredProducts',
-            'latestArticles',
-            'homepageContent',
-            'companyName',
-            'companyTagline',
-            'companyDescription',
-            'seoTitle',
-            'seoDescription',
-            'seoKeywords'
-        ));
+        return view('frontend.homepage', compact('featuredProducts', 'latestArticles', 'homepageContent'));
     }
 }

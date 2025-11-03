@@ -1,6 +1,6 @@
 <x-frontend-layout>
     <x-slot name="title">{{ $article->title }} - PT Lestari Jaya Bangsa</x-slot>
-    <x-slot name="metaDescription">{{ $article->excerpt ?? Str::limit(strip_tags($article->content), 160) }}</x-slot>
+    <x-slot name="metaDescription">{{ $article->excerpt ?? \Illuminate\Support\Str::limit(strip_tags($article->content), 160) }}</x-slot>
 
     <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <!-- Breadcrumb -->
@@ -22,7 +22,7 @@
                         <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
                             <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
                         </svg>
-                        <span class="text-gray-500 ml-1 md:ml-2">{{ Str::limit($article->title, 30) }}</span>
+                        <span class="text-gray-500 ml-1 md:ml-2">{{ \Illuminate\Support\Str::limit($article->title, 30) }}</span>
                     </div>
                 </li>
             </ol>
@@ -48,12 +48,12 @@
                 <time datetime="{{ $article->published_at->toISOString() }}">
                     {{ $article->published_at->format('F d, Y') }}
                 </time>
-                @if($article->tags->count() > 0)
+                @if($article->tags && count($article->tags) > 0)
                     <span class="mx-2">•</span>
-                    <div class="flex gap-1">
+                    <div class="flex gap-1 flex-wrap">
                         @foreach($article->tags as $tag)
-                            <a href="{{ route('articles.index', ['tag' => $tag->name]) }}"
-                               class="text-green-600 hover:text-green-700">#{{ $tag->name }}</a>
+                            <a href="{{ route('articles.index', ['tag' => is_array($tag) ? $tag['name'] : $tag->name ?? $tag]) }}"
+                               class="text-green-600 hover:text-green-700">#{{ is_array($tag) ? $tag['name'] : $tag->name ?? $tag }}</a>
                             @if(!$loop->last)
                                 <span>,</span>
                             @endif
@@ -66,7 +66,7 @@
         <!-- Featured Image -->
         @if($article->featured_image)
             <div class="mb-8">
-                <img src="{{ asset('uploads/' . $article->featured_image) }}" alt="{{ $article->title }}" class="w-full rounded-lg shadow-md">
+                <img src="{{ asset('storage/' . $article->featured_image) }}" alt="{{ $article->title }}" class="w-full rounded-lg shadow-md" loading="lazy">
             </div>
         @endif
 
@@ -102,10 +102,10 @@
                 @foreach($relatedArticles as $relatedArticle)
                 <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                     @if($relatedArticle->featured_image)
-                        <img src="{{ asset('uploads/' . $relatedArticle->featured_image) }}" alt="{{ $relatedArticle->title }}" class="w-full h-32 object-cover">
+                        <img src="{{ asset('storage/' . $relatedArticle->featured_image) }}" alt="{{ $relatedArticle->title }}" class="w-full h-32 object-cover" loading="lazy">
                     @else
-                        <div class="w-full h-32 bg-gray-200 flex items-center justify-center">
-                            <span class="text-gray-400 text-sm">No Image</span>
+                        <div class="w-full h-32 bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
+                            <span class="text-green-400 text-2xl">📰</span>
                         </div>
                     @endif
                     <div class="p-4">

@@ -3,9 +3,10 @@
 namespace App\Modules\Admin\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreRoleRequest;
+use App\Http\Requests\UpdateRoleRequest;
 use Spatie\Permission\Models\Role;
 use Spatie\Permission\Models\Permission;
-use Illuminate\Http\Request;
 
 class RoleController extends Controller
 {
@@ -14,7 +15,9 @@ class RoleController extends Controller
      */
     public function index()
     {
-        $roles = Role::withCount('users', 'permissions')->get();
+        $this->authorize('view roles');
+
+        $roles = Role::withCount('users', 'permissions')->orderBy('name')->get();
         return view('admin.roles.index', compact('roles'));
     }
 
@@ -23,6 +26,8 @@ class RoleController extends Controller
      */
     public function create()
     {
+        $this->authorize('create roles');
+
         $permissions = Permission::all()->groupBy(function ($permission) {
             $parts = explode(' ', $permission->name);
             return $parts[0] ?? 'other';
@@ -33,13 +38,9 @@ class RoleController extends Controller
     /**
      * Store a newly created role in storage.
      */
-    public function store(Request $request)
+    public function store(StoreRoleRequest $request)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255', 'unique:roles,name'],
-            'permissions' => ['required', 'array'],
-            'permissions.*' => ['exists:permissions,name'],
-        ]);
+        $validated = $request->validated();
 
         $role = Role::create(['name' => $validated['name']]);
         $role->givePermissionTo($validated['permissions']);
@@ -53,9 +54,10 @@ class RoleController extends Controller
      */
     public function show(Role $role)
     {
+        $this->authorize('view roles');
+
         $role->load('permissions', 'users');
         $allPermissions = Permission::all()->groupBy(function ($permission) {
-            // Group by prefix (e.g., 'view', 'create', 'edit', 'delete')
             $parts = explode(' ', $permission->name);
             return $parts[0] ?? 'other';
         });
@@ -68,6 +70,8 @@ class RoleController extends Controller
      */
     public function edit(Role $role)
     {
+        $this->authorize('edit roles');
+
         $permissions = Permission::all()->groupBy(function ($permission) {
             $parts = explode(' ', $permission->name);
             return $parts[0] ?? 'other';
@@ -80,21 +84,24 @@ class RoleController extends Controller
     /**
      * Update the specified role in storage.
      */
-    public function update(Request $request, Role $role)
+    public function update(UpdateRoleRequest $request, Role $role)
     {
-        // Prevent editing built-in roles
+        // Prevent editing built-in roles' names
         if (in_array($role->name, ['Super Admin', 'Admin', 'Marketing'])) {
-            return redirect()->route('admin.roles.index')
-                ->with('error', 'Built-in roles cannot be renamed.');
+            // Only allow permission changes for built-in roles, not name changes
+            if ($request->name !== $role->name) {
+                return redirect()->route('admin.roles.index')
+                    ->with('error', 'Built-in roles cannot be renamed.');
+            }
         }
 
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255', 'unique:roles,name,' . $role->id],
-            'permissions' => ['required', 'array'],
-            'permissions.*' => ['exists:permissions,name'],
-        ]);
+        $validated = $request->validated();
 
-        $role->update(['name' => $validated['name']]);
+        // Only update name if it's not a built-in role
+        if (!in_array($role->name, ['Super Admin', 'Admin', 'Marketing'])) {
+            $role->update(['name' => $validated['name']]);
+        }
+
         $role->syncPermissions($validated['permissions']);
 
         return redirect()->route('admin.roles.index')
@@ -106,6 +113,8 @@ class RoleController extends Controller
      */
     public function destroy(Role $role)
     {
+        $this->authorize('delete roles');
+
         // Prevent deleting built-in roles
         if (in_array($role->name, ['Super Admin', 'Admin', 'Marketing'])) {
             return redirect()->route('admin.roles.index')
@@ -123,4 +132,3 @@ class RoleController extends Controller
             ->with('success', 'Role deleted successfully.');
     }
 }
-

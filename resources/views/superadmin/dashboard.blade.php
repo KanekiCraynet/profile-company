@@ -11,8 +11,8 @@
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Total Users</h3>
-                    <p class="text-2xl font-bold text-blue-600">{{ $stats['total_users'] }}</p>
+                    <h3 class="text-sm font-medium text-gray-600">Total Users</h3>
+                    <p class="text-2xl font-bold text-blue-600">{{ $stats['total_users'] ?? 0 }}</p>
                 </div>
             </div>
         </div>
@@ -24,13 +24,13 @@
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                     </svg>
                 </div>
-                <div class="ml-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Total Products</h3>
-                    <p class="text-2xl font-bold text-green-600">{{ $stats['total_products'] }}</p>
-                    <p class="text-sm text-gray-500">{{ $stats['active_products'] }} active</p>
+                    <div class="ml-4">
+                    <h3 class="text-sm font-medium text-gray-600">Total Products</h3>
+                    <p class="text-2xl font-bold text-green-600">{{ $stats['total_products'] ?? 0 }}</p>
+                    <p class="text-xs text-gray-500 mt-1">{{ $stats['active_products'] ?? 0 }} active</p>
                 </div>
             </div>
-            </div>
+        </div>
 
         <div class="bg-white p-6 rounded-lg shadow-md">
             <div class="flex items-center">
@@ -40,9 +40,9 @@
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <h3 class="text-lg font-semibold text-gray-900">Total Articles</h3>
-                    <p class="text-2xl font-bold text-purple-600">{{ $stats['total_articles'] }}</p>
-                    <p class="text-sm text-gray-500">{{ $stats['published_articles'] }} published</p>
+                    <h3 class="text-sm font-medium text-gray-600">Total Articles</h3>
+                    <p class="text-2xl font-bold text-purple-600">{{ $stats['total_articles'] ?? 0 }}</p>
+                    <p class="text-xs text-gray-500 mt-1">{{ $stats['published_articles'] ?? 0 }} published</p>
                 </div>
             </div>
         </div>
@@ -55,9 +55,9 @@
                     </svg>
                 </div>
                 <div class="ml-4">
-                    <h3 class="text-lg font-semibold text-gray-900">New Contacts</h3>
-                    <p class="text-2xl font-bold text-yellow-600">{{ $stats['unread_contacts'] }}</p>
-                    <p class="text-sm text-gray-500">of {{ $stats['total_contacts'] }} total</p>
+                    <h3 class="text-sm font-medium text-gray-600">New Contacts</h3>
+                    <p class="text-2xl font-bold text-yellow-600">{{ $stats['unread_contacts'] ?? 0 }}</p>
+                    <p class="text-xs text-gray-500 mt-1">{{ $stats['total_contacts'] ?? 0 }} total</p>
                 </div>
             </div>
         </div>
@@ -153,13 +153,13 @@
                         @foreach($recentArticles as $article)
                         <div class="flex items-center justify-between">
                             <div>
-                                <p class="font-medium text-gray-900">{{ Str::limit($article->title, 30) }}</p>
+                                <p class="font-medium text-gray-900">{{ \Illuminate\Support\Str::limit($article->title, 30) }}</p>
                                 <p class="text-sm text-gray-600">By {{ $article->author->name ?? 'Unknown' }}</p>
                                 <p class="text-xs text-gray-500">{{ $article->created_at->diffForHumans() }}</p>
                             </div>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                {{ $article->status === 'published' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-                                {{ ucfirst($article->status) }}
+                                {{ ($article->is_published ?? false) ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                                {{ ($article->is_published ?? false) ? 'Published' : 'Draft' }}
                             </span>
                         </div>
                         @endforeach

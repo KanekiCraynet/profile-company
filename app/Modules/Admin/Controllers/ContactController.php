@@ -3,42 +3,80 @@
 namespace App\Modules\Admin\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateContactRequest;
 use App\Models\Contact;
 use Illuminate\Http\Request;
 
 class ContactController extends Controller
 {
-    public function index()
+    /**
+     * Display a listing of contacts.
+     */
+    public function index(Request $request)
     {
-        $contacts = Contact::orderBy('created_at', 'desc')->paginate(15);
+        $this->authorize('view contacts');
+
+        $query = Contact::orderBy('created_at', 'desc');
+
+        // Filter by status
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $contacts = $query->paginate(15);
         return view('admin.contacts.index', compact('contacts'));
     }
 
+    /**
+     * Display the specified contact.
+     */
     public function show(Contact $contact)
     {
+        $this->authorize('view contacts');
+
+        // Mark as read if unread
+        if ($contact->status === 'unread' && !$contact->read_at) {
+            $contact->update([
+                'status' => 'read',
+                'read_at' => now(),
+            ]);
+        }
+
         return view('admin.contacts.show', compact('contact'));
     }
 
-    public function update(Request $request, Contact $contact)
+    /**
+     * Update the specified contact in storage.
+     */
+    public function update(UpdateContactRequest $request, Contact $contact)
     {
-        $request->validate([
-            'status' => 'required|in:pending,responded,closed',
-            'notes' => 'nullable|string',
-        ]);
+        $this->authorize('edit contacts');
+
+        $validated = $request->validated();
 
         $contact->update([
-            'status' => $request->status,
-            'admin_notes' => $request->notes,
-            'responded_at' => $request->status === 'responded' ? now() : null,
-            'responded_by' => auth()->id(),
+            'status' => $validated['status'],
         ]);
 
-        return redirect()->route('admin.contacts.index')->with('success', 'Contact updated successfully.');
+        // Mark as read if status is being updated to read or replied
+        if ($validated['status'] !== 'unread' && !$contact->read_at) {
+            $contact->update(['read_at' => now()]);
+        }
+
+        return redirect()->route('admin.contacts.index')
+            ->with('success', 'Contact updated successfully.');
     }
 
+    /**
+     * Remove the specified contact from storage.
+     */
     public function destroy(Contact $contact)
     {
+        $this->authorize('delete contacts');
+
         $contact->delete();
-        return redirect()->route('admin.contacts.index')->with('success', 'Contact deleted successfully.');
+
+        return redirect()->route('admin.contacts.index')
+            ->with('success', 'Contact deleted successfully.');
     }
 }

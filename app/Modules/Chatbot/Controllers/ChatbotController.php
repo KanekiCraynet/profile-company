@@ -3,62 +3,48 @@
 namespace App\Modules\Chatbot\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\ChatbotRule;
-use App\Models\ChatHistory;
+use App\Services\ChatbotService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 
 class ChatbotController extends Controller
 {
+    public function __construct(
+        protected ChatbotService $chatbotService
+    ) {}
+
+    /**
+     * Handle chatbot message.
+     *
+     * @param \Illuminate\Http\Request $request
+     * @return \Illuminate\Http\JsonResponse
+     */
     public function handleMessage(Request $request)
     {
         $request->validate([
-            'message' => 'required|string|max:500'
+            'message' => 'required|string|max:500',
+            'session_id' => 'nullable|string|max:255',
         ]);
 
-        $message = strtolower(trim($request->message));
-        $userId = auth()->id();
+        try {
+            $result = $this->chatbotService->processMessage(
+                $request->message,
+                $request->session_id,
+                $request->ip(),
+                $request->userAgent()
+            );
 
-        // Check for keyword matches in chatbot rules
-        $rules = Cache::remember('chatbot_rules', 3600, function () {
-            return ChatbotRule::where('status', 'active')->get();
-        });
-
-        $response = null;
-        $matchedRule = null;
-
-        foreach ($rules as $rule) {
-            // Check if the keyword appears in the message
-            if (str_contains($message, strtolower($rule->keyword))) {
-                $response = $rule->response;
-                $matchedRule = $rule;
-                break;
-            }
+            return response()->json([
+                'success' => true,
+                'response' => $result['response'],
+                'session_id' => $result['session_id'],
+                'timestamp' => now()->toISOString(),
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'response' => 'Sorry, an error occurred. Please try again.',
+                'timestamp' => now()->toISOString(),
+            ], 500);
         }
-
-        // Fallback responses if no keyword match
-        if (!$response) {
-            $fallbacks = [
-                'I\'m sorry, I didn\'t understand that. Could you please rephrase your question?',
-                'I\'m here to help with information about our products and services. What would you like to know?',
-                'Please check our website for more detailed information, or feel free to ask about our products!',
-            ];
-            $response = $fallbacks[array_rand($fallbacks)];
-        }
-
-        // Save chat history
-        ChatHistory::create([
-            'user_id' => $userId,
-            'user_message' => $request->message,
-            'bot_response' => $response,
-            'rule_id' => $matchedRule ? $matchedRule->id : null,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
-
-        return response()->json([
-            'response' => $response,
-            'timestamp' => now()->toISOString()
-        ]);
     }
 }

@@ -3,11 +3,11 @@
 namespace App\Modules\Admin\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreUserRequest;
+use App\Http\Requests\UpdateUserRequest;
 use App\Models\User;
-use Illuminate\Http\Request;
-use Spatie\Permission\Models\Role;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Validation\Rules\Password;
+use Spatie\Permission\Models\Role;
 
 class UserController extends Controller
 {
@@ -16,6 +16,8 @@ class UserController extends Controller
      */
     public function index()
     {
+        $this->authorize('view users');
+
         $users = User::with('roles')->orderBy('created_at', 'desc')->paginate(15);
         return view('admin.users.index', compact('users'));
     }
@@ -25,6 +27,8 @@ class UserController extends Controller
      */
     public function create()
     {
+        $this->authorize('create users');
+
         $roles = Role::all();
         return view('admin.users.create', compact('roles'));
     }
@@ -32,15 +36,9 @@ class UserController extends Controller
     /**
      * Store a newly created user in storage.
      */
-    public function store(Request $request)
+    public function store(StoreUserRequest $request)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users'],
-            'password' => ['required', 'confirmed', Password::defaults()],
-            'roles' => ['required', 'array'],
-            'roles.*' => ['exists:roles,name'],
-        ]);
+        $validated = $request->validated();
 
         $user = User::create([
             'name' => $validated['name'],
@@ -60,6 +58,8 @@ class UserController extends Controller
      */
     public function show(User $user)
     {
+        $this->authorize('view users');
+
         $user->load('roles', 'permissions');
         return view('admin.users.show', compact('user'));
     }
@@ -69,6 +69,8 @@ class UserController extends Controller
      */
     public function edit(User $user)
     {
+        $this->authorize('edit users');
+
         $roles = Role::all();
         $user->load('roles');
         return view('admin.users.edit', compact('user', 'roles'));
@@ -77,15 +79,9 @@ class UserController extends Controller
     /**
      * Update the specified user in storage.
      */
-    public function update(Request $request, User $user)
+    public function update(UpdateUserRequest $request, User $user)
     {
-        $validated = $request->validate([
-            'name' => ['required', 'string', 'max:255'],
-            'email' => ['required', 'string', 'email', 'max:255', 'unique:users,email,' . $user->id],
-            'password' => ['nullable', 'confirmed', Password::defaults()],
-            'roles' => ['required', 'array'],
-            'roles.*' => ['exists:roles,name'],
-        ]);
+        $validated = $request->validated();
 
         $user->update([
             'name' => $validated['name'],
@@ -109,10 +105,21 @@ class UserController extends Controller
      */
     public function destroy(User $user)
     {
+        $this->authorize('delete users');
+
         // Prevent deleting own account
         if ($user->id === auth()->id()) {
             return redirect()->route('admin.users.index')
                 ->with('error', 'You cannot delete your own account.');
+        }
+
+        // Prevent deleting last Super Admin
+        if ($user->hasRole('Super Admin')) {
+            $superAdminCount = User::role('Super Admin')->count();
+            if ($superAdminCount <= 1) {
+                return redirect()->route('admin.users.index')
+                    ->with('error', 'Cannot delete the last Super Admin user.');
+            }
         }
 
         $user->delete();
@@ -121,6 +128,9 @@ class UserController extends Controller
             ->with('success', 'User deleted successfully.');
     }
 }
+<<<<<<< Current (Your changes)
 
 
 
+=======
+>>>>>>> Incoming (Background Agent changes)
