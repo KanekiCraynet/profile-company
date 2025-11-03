@@ -12,19 +12,6 @@
     <title>{{ $seoMeta['title'] ?? ($title ?? config('app.name', 'PT Lestari Jaya Bangsa')) }}</title>
 
     <!-- SEO Meta Tags -->
-<<<<<<< Current (Your changes)
-    <meta name="description" content="{{ $metaDescription ?? 'PT Lestari Jaya Bangsa provides high-quality herbal and processed food products, committed to prioritizing both health and taste.' }}">
-    <meta name="keywords" content="{{ $metaKeywords ?? 'herbal products, food products, natural ingredients, BPOM certified, Halal MUI' }}">
-    <link rel="canonical" href="{{ url()->current() }}">
-
-    <!-- Open Graph -->
-    <meta property="og:title" content="{{ $title ?? config('app.name', 'PT Lestari Jaya Bangsa') }}">
-    <meta property="og:description" content="{{ $metaDescription ?? 'PT Lestari Jaya Bangsa provides high-quality herbal and processed food products.' }}">
-    <meta property="og:type" content="website">
-    <meta property="og:url" content="{{ url()->current() }}">
-    @if(isset($ogImage))
-    <meta property="og:image" content="{{ $ogImage }}">
-=======
     <meta name="description" content="{{ $seoMeta['description'] ?? 'PT Lestari Jaya Bangsa provides high-quality herbal and processed food products, committed to prioritizing both health and taste.' }}">
     <meta name="keywords" content="{{ $seoMeta['keywords'] ?? 'herbal products, food products, natural ingredients, BPOM certified, Halal MUI' }}">
 
@@ -47,7 +34,6 @@
     <script type="application/ld+json">
         {!! json_encode($seoMeta['json_ld']) !!}
     </script>
->>>>>>> Incoming (Background Agent changes)
     @endif
 
     <!-- Fonts -->
@@ -100,9 +86,9 @@
                 <!-- Desktop Auth Button -->
                 <div class="hidden md:flex items-center">
                     @auth
-                        <a href="{{ route('admin.dashboard') }}" class="bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700 transition-colors">Dashboard</a>
+                    <a href="{{ route('admin.dashboard') }}" class="bg-green-600 text-white px-4 py-2 rounded-md text-sm font-medium hover:bg-green-700 transition-colors">Dashboard</a>
                     @else
-                        <a href="{{ route('login') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Login</a>
+                    <a href="{{ route('login') }}" class="text-gray-700 hover:text-green-600 px-3 py-2 rounded-md text-sm font-medium transition-colors">Login</a>
                     @endauth
                 </div>
             </div>
@@ -119,9 +105,9 @@
             <a href="{{ route('contact') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50 {{ request()->routeIs('contact') ? 'text-green-600 bg-green-50' : '' }}">Contact</a>
             <div class="border-t border-gray-200 pt-2 mt-2">
                 @auth
-                    <a href="{{ route('admin.dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium bg-green-600 text-white hover:bg-green-700">Dashboard</a>
+                <a href="{{ route('admin.dashboard') }}" class="block px-3 py-2 rounded-md text-base font-medium bg-green-600 text-white hover:bg-green-700">Dashboard</a>
                 @else
-                    <a href="{{ route('login') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50">Login</a>
+                <a href="{{ route('login') }}" class="block px-3 py-2 rounded-md text-base font-medium text-gray-700 hover:text-green-600 hover:bg-gray-50">Login</a>
                 @endauth
             </div>
         </div>
@@ -226,13 +212,9 @@
             const sendButton = document.getElementById('send-message');
             const chatMessages = document.getElementById('chat-messages');
 
-            if (chatbotButton) {
-                chatbotButton.addEventListener('click', function() {
-                    if (chatbotWindow) {
-                        chatbotWindow.classList.toggle('hidden');
-                    }
-                });
-            }
+            chatbotButton.addEventListener('click', function() {
+                chatbotWindow.classList.toggle('hidden');
+            });
 
             function sendMessage() {
                 const message = chatInput.value.trim();
@@ -278,16 +260,12 @@
                 });
             }
 
-            if (sendButton) {
-                sendButton.addEventListener('click', sendMessage);
-            }
-            if (chatInput) {
-                chatInput.addEventListener('keypress', function(e) {
-                    if (e.key === 'Enter') {
-                        sendMessage();
-                    }
-                });
-            }
+            sendButton.addEventListener('click', sendMessage);
+            chatInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
 
             function addMessage(text, sender) {
                 const messageDiv = document.createElement('div');

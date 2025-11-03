@@ -132,7 +132,7 @@
                         <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ $article->title }}</h3>
                         <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ $article->excerpt ?? \Illuminate\Support\Str::limit(strip_tags($article->content), 120) }}</p>
                         <div class="flex justify-between items-center text-sm text-gray-500">
-                            <span>{{ $article->published_at->format('M d, Y') }}</span>
+                            <span>{{ $article->published_at?->format('M d, Y') ?? 'Not published' }}</span>
                             <a href="{{ route('articles.show', $article->slug) }}" class="text-green-600 hover:text-green-700 font-medium">
                                 Read More →
                             </a>

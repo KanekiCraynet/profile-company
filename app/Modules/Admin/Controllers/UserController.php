@@ -129,8 +129,11 @@ class UserController extends Controller
     }
 }
 <<<<<<< Current (Your changes)
+<<<<<<< Current (Your changes)
 
 
 
+=======
+>>>>>>> Incoming (Background Agent changes)
 =======
 >>>>>>> Incoming (Background Agent changes)
