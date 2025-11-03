@@ -14,7 +14,7 @@ class ArticleCategory extends Model
         'name',
         'slug',
         'description',
-        'status',
+        'is_active',
     ];
 
     public function articles()

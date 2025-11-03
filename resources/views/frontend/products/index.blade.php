@@ -1,6 +1,7 @@
 <x-frontend-layout>
     <x-slot name="title">Products - PT Lestari Jaya Bangsa</x-slot>
     <x-slot name="metaDescription">Explore our range of high-quality herbal and processed food products. All products are BPOM certified and Halal MUI approved.</x-slot>
+    <x-slot name="metaKeywords">herbal products, food products, natural ingredients, BPOM certified, Halal MUI, PT Lestari Jaya Bangsa</x-slot>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <!-- Header -->
@@ -61,8 +62,8 @@
                 @foreach($products as $product)
                 <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                     <div class="aspect-w-1 aspect-h-1 bg-gray-200">
-                        @if($product->getFirstMediaUrl('products'))
-                            <img src="{{ $product->getFirstMediaUrl('products') }}" alt="{{ $product->name }}" class="w-full h-48 object-cover">
+                        @if($product->getFirstMediaUrl('images'))
+                            <img src="{{ $product->getFirstMediaUrl('images') }}" alt="{{ $product->name }}" class="w-full h-48 object-cover" loading="lazy">
                         @else
                             <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
                                 <span class="text-gray-400">No Image</span>
@@ -87,7 +88,11 @@
                         </div>
 
                         <div class="flex justify-between items-center">
-                            <span class="text-green-600 font-semibold text-lg">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
+                            @if($product->price)
+                                <span class="text-green-600 font-semibold text-lg">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
+                            @else
+                                <span class="text-gray-500 text-sm">Contact for price</span>
+                            @endif
                             <a href="{{ route('products.show', $product->slug) }}" class="bg-green-600 text-white px-4 py-2 rounded-md text-sm hover:bg-green-700 transition-colors">
                                 View Details
                             </a>

@@ -61,5 +61,20 @@ Route::middleware('auth')->group(function () {
         Route::middleware('role:Marketing')->group(function () {
             Route::get('chatbot-history', [\App\Modules\Admin\Controllers\ChatbotController::class, 'history'])->name('chatbot.history');
         });
+
+        // Super Admin only routes
+        Route::middleware('role:Super Admin')->group(function () {
+            // User Management
+            Route::resource('users', \App\Modules\Admin\Controllers\UserController::class);
+            
+            // Role & Permission Management
+            Route::resource('roles', \App\Modules\Admin\Controllers\RoleController::class);
+            
+            // Settings Management
+            Route::get('settings', [\App\Modules\Settings\Controllers\SettingsController::class, 'index'])->name('settings.index');
+            Route::put('settings', [\App\Modules\Settings\Controllers\SettingsController::class, 'update'])->name('settings.update');
+            Route::post('settings', [\App\Modules\Settings\Controllers\SettingsController::class, 'store'])->name('settings.store');
+            Route::delete('settings/{setting}', [\App\Modules\Settings\Controllers\SettingsController::class, 'destroy'])->name('settings.destroy');
+        });
     });
 });

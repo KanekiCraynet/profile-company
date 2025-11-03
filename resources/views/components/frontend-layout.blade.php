@@ -9,12 +9,17 @@
 
     <!-- SEO Meta Tags -->
     <meta name="description" content="{{ $metaDescription ?? 'PT Lestari Jaya Bangsa provides high-quality herbal and processed food products, committed to prioritizing both health and taste.' }}">
-    <meta name="keywords" content="herbal products, food products, natural ingredients, BPOM certified, Halal MUI">
+    <meta name="keywords" content="{{ $metaKeywords ?? 'herbal products, food products, natural ingredients, BPOM certified, Halal MUI' }}">
+    <link rel="canonical" href="{{ url()->current() }}">
 
     <!-- Open Graph -->
     <meta property="og:title" content="{{ $title ?? config('app.name', 'PT Lestari Jaya Bangsa') }}">
     <meta property="og:description" content="{{ $metaDescription ?? 'PT Lestari Jaya Bangsa provides high-quality herbal and processed food products.' }}">
     <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    @if(isset($ogImage))
+    <meta property="og:image" content="{{ $ogImage }}">
+    @endif
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">

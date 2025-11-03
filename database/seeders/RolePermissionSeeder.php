@@ -57,6 +57,8 @@ class RolePermissionSeeder extends Seeder
             'edit roles',
             'delete roles',
 
+            // Permission permissions (implicitly handled by role permissions)
+
             // Settings permissions
             'view settings',
             'edit settings',

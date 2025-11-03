@@ -18,6 +18,8 @@ class Contact extends Model
         'message',
         'status',
         'read_at',
+        'ip_address',
+        'user_agent',
     ];
 
     protected $casts = [

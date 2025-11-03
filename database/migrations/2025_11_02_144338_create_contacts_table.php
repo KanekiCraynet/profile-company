@@ -22,6 +22,9 @@ return new class extends Migration
             $table->timestamp('read_at')->nullable();
             $table->softDeletes();
             $table->timestamps();
+
+            $table->index('status');
+            $table->index('created_at');
         });
     }
 
