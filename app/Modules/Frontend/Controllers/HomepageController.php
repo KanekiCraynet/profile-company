@@ -30,7 +30,7 @@ class HomepageController extends Controller
         // Get latest articles with caching (limit to 3)
         $latestArticles = Cache::remember('homepage.latest_articles', 1800, function () {
             return Article::with(['category', 'author'])
-                ->where('status', 'published')
+                ->where('is_published', true)
                 ->where('published_at', '<=', now())
                 ->orderBy('published_at', 'desc')
                 ->limit(3)

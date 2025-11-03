@@ -41,7 +41,7 @@ class ArticleSeeder extends Seeder
 <p>At PT Lestari Jaya Bangsa, we carefully select the finest ginger roots to create our premium ginger tea blends, ensuring you receive all the natural benefits of this remarkable herb.</p>',
                 'category_id' => $healthCategory?->id,
                 'author_id' => $admin?->id,
-                'status' => 'published',
+                'is_published' => true,
                 'published_at' => now()->subDays(5),
             ],
             [
@@ -68,7 +68,7 @@ class ArticleSeeder extends Seeder
 <p>When you choose our Halal-certified products, you\'re not just making a choice for your health—you\'re also making an ethical choice that supports sustainable and responsible production practices.</p>',
                 'category_id' => $productCategory?->id,
                 'author_id' => $admin?->id,
-                'status' => 'published',
+                'is_published' => true,
                 'published_at' => now()->subDays(3),
             ],
         ];

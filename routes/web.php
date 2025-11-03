@@ -8,6 +8,7 @@ use App\Modules\Frontend\Controllers\HomepageController;
 use App\Modules\Frontend\Controllers\ProductsController;
 use App\Modules\Frontend\Controllers\ArticlesController;
 use App\Modules\Frontend\Controllers\PagesController;
+use App\Modules\Chatbot\Controllers\ChatbotController;
 
 // Frontend Routes
 Route::get('/', [HomepageController::class, 'index'])->name('home');
@@ -18,6 +19,9 @@ Route::get('/articles/{slug}', [ArticlesController::class, 'show'])->name('artic
 Route::get('/about', [PagesController::class, 'about'])->name('about');
 Route::get('/contact', [PagesController::class, 'contact'])->name('contact');
 Route::post('/contact', [PagesController::class, 'storeContact'])->name('contact.store');
+
+// API Routes
+Route::post('/api/chatbot', [ChatbotController::class, 'handleMessage'])->name('api.chatbot');
 
 // Authentication Routes
 Route::middleware('guest')->group(function () {

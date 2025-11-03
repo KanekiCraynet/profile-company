@@ -158,9 +158,13 @@
             const sendButton = document.getElementById('send-message');
             const chatMessages = document.getElementById('chat-messages');
 
-            chatbotButton.addEventListener('click', function() {
-                chatbotWindow.classList.toggle('hidden');
-            });
+            if (chatbotButton) {
+                chatbotButton.addEventListener('click', function() {
+                    if (chatbotWindow) {
+                        chatbotWindow.classList.toggle('hidden');
+                    }
+                });
+            }
 
             function sendMessage() {
                 const message = chatInput.value.trim();
@@ -188,12 +192,16 @@
                 });
             }
 
-            sendButton.addEventListener('click', sendMessage);
-            chatInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    sendMessage();
-                }
-            });
+            if (sendButton) {
+                sendButton.addEventListener('click', sendMessage);
+            }
+            if (chatInput) {
+                chatInput.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        sendMessage();
+                    }
+                });
+            }
 
             function addMessage(text, sender) {
                 const messageDiv = document.createElement('div');
