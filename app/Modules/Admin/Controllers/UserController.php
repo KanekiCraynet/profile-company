@@ -128,12 +128,3 @@ class UserController extends Controller
             ->with('success', 'User deleted successfully.');
     }
 }
-<<<<<<< Current (Your changes)
-<<<<<<< Current (Your changes)
-
-
-
-=======
->>>>>>> Incoming (Background Agent changes)
-=======
->>>>>>> Incoming (Background Agent changes)

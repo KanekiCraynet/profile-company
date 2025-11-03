@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 
 class ChatbotController extends Controller
 {
+<<<<<<< Current (Your changes)
     public function __construct(
         protected ChatbotService $chatbotService
     ) {}
@@ -17,6 +18,21 @@ class ChatbotController extends Controller
      *
      * @param \Illuminate\Http\Request $request
      * @return \Illuminate\Http\JsonResponse
+=======
+    /**
+     * Handle GET request to chatbot endpoint (returns error message)
+     */
+    public function handleGet()
+    {
+        return response()->json([
+            'error' => 'This endpoint only accepts POST requests. Please use the chatbot interface.',
+            'message' => 'Use POST method with a JSON body containing {"message": "your message"}'
+        ], 405);
+    }
+
+    /**
+     * Handle POST request with chatbot message
+>>>>>>> Incoming (Background Agent changes)
      */
     public function handleMessage(Request $request)
     {
