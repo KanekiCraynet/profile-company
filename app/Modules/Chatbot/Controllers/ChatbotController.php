@@ -31,11 +31,13 @@ class ChatbotController extends Controller
         ]);
 
         $message = strtolower(trim($request->message));
-        $userId = auth()->id();
+        $userId = auth()->id(); // Can be null for unauthenticated users
 
         // Check for keyword matches in chatbot rules
         $rules = Cache::remember('chatbot_rules', 3600, function () {
-            return ChatbotRule::where('status', 'active')->get();
+            return ChatbotRule::where('status', 'active')
+                ->orderBy('priority', 'desc')
+                ->get();
         });
 
         $response = null;
@@ -43,7 +45,8 @@ class ChatbotController extends Controller
 
         foreach ($rules as $rule) {
             // Check if the keyword appears in the message
-            if (str_contains($message, strtolower($rule->keyword))) {
+            $keyword = strtolower(trim($rule->keyword));
+            if (!empty($keyword) && str_contains($message, $keyword)) {
                 $response = $rule->response;
                 $matchedRule = $rule;
                 break;
@@ -61,14 +64,26 @@ class ChatbotController extends Controller
         }
 
         // Save chat history
-        ChatHistory::create([
-            'user_id' => $userId,
-            'user_message' => $request->message,
-            'bot_response' => $response,
-            'rule_id' => $matchedRule ? $matchedRule->id : null,
-            'ip_address' => $request->ip(),
-            'user_agent' => $request->userAgent(),
-        ]);
+        try {
+            $sessionId = session()->getId() ?? null;
+            
+            ChatHistory::create([
+                'session_id' => $sessionId,
+                'user_id' => $userId,
+                'user_message' => $request->message,
+                'bot_response' => $response,
+                'rule_id' => $matchedRule ? $matchedRule->id : null,
+                'ip_address' => $request->ip(),
+                'user_agent' => $request->userAgent() ?? 'Unknown',
+            ]);
+        } catch (\Exception $e) {
+            // Log the error but don't fail the request
+            \Log::error('Failed to save chat history: ' . $e->getMessage(), [
+                'exception' => $e,
+                'user_id' => $userId,
+                'message' => $request->message
+            ]);
+        }
 
         return response()->json([
             'response' => $response,

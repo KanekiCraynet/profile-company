@@ -20,7 +20,7 @@ Route::get('/about', [PagesController::class, 'about'])->name('about');
 Route::get('/contact', [PagesController::class, 'contact'])->name('contact');
 Route::post('/contact', [PagesController::class, 'storeContact'])->name('contact.store');
 
-// Chatbot API route (public)
+// Chatbot API route (public, but needs session for tracking)
 Route::post('/chatbot/message', [ChatbotController::class, 'handleMessage'])->name('chatbot.message');
 
 // Authentication Routes
