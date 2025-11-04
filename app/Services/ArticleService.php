@@ -91,7 +91,8 @@ class ArticleService
      */
     public function incrementViews(Article $article): void
     {
-        $article->increment('view_count');
+        // View count tracking disabled - column not available in database
+        // $article->increment('view_count');
         Cache::forget("article.slug.{$article->slug}");
     }
 

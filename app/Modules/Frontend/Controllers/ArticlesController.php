@@ -23,7 +23,6 @@ class ArticlesController extends Controller
         $data = Cache::remember($cacheKey, 1800, function () use ($request) {
             $query = \App\Models\Article::with(['category', 'author'])
                 ->where('is_published', true)
-                ->where('status', 'published')
                 ->where('published_at', '<=', now());
 
             // Filter by category
@@ -48,7 +47,7 @@ class ArticlesController extends Controller
 
             return [
                 'articles' => $query->orderBy('published_at', 'desc')->paginate(9),
-                'categories' => ArticleCategory::where('is_active', true)->get(),
+                'categories' => ArticleCategory::all(),
             ];
         });
 

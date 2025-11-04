@@ -4,40 +4,47 @@
 
     <!-- Schema.org Product Markup -->
     <script type="application/ld+json">
-    {
-        "@context": "https://schema.org",
-        "@type": "Product",
-        "name": "{{ $product->name }}",
-        "description": "{{ strip_tags($product->description ?? '') }}",
-        @if($product->getFirstMediaUrl('images'))
-        "image": "{{ $product->getFirstMediaUrl('images') }}",
-        @endif
-        @if($product->price)
-        "offers": {
-            "@type": "Offer",
-            "price": "{{ $product->price }}",
-            "priceCurrency": "IDR",
-            "availability": "{{ $product->stock_quantity > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock' }}"
-        },
-        @endif
-        "brand": {
-            "@type": "Brand",
-            "name": "PT Lestari Jaya Bangsa"
-        },
-        @if($product->category)
-        "category": "{{ $product->category->name }}",
-        @endif
-        @if($product->is_halal_certified)
-        "additionalProperty": [
-            {
-                "@type": "PropertyValue",
-                "name": "Halal Certification",
-                "value": "MUI Certified"
-            }
-        ],
-        @endif
-        "url": "{{ route('products.show', $product->slug) }}"
-    }
+    @php
+        $schema = [
+            "@context" => "https://schema.org",
+            "@type" => "Product",
+            "name" => $product->name,
+            "description" => strip_tags($product->description ?? ''),
+            "brand" => [
+                "@type" => "Brand",
+                "name" => "PT Lestari Jaya Bangsa"
+            ],
+            "url" => route('products.show', $product->slug)
+        ];
+        
+        if ($product->getFirstMediaUrl('images')) {
+            $schema["image"] = $product->getFirstMediaUrl('images');
+        }
+        
+        if ($product->price) {
+            $schema["offers"] = [
+                "@type" => "Offer",
+                "price" => (string) $product->price,
+                "priceCurrency" => "IDR",
+                "availability" => $product->stock_quantity > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'
+            ];
+        }
+        
+        if ($product->category) {
+            $schema["category"] = $product->category->name;
+        }
+        
+        if ($product->is_halal_certified) {
+            $schema["additionalProperty"] = [
+                [
+                    "@type" => "PropertyValue",
+                    "name" => "Halal Certification",
+                    "value" => "MUI Certified"
+                ]
+            ];
+        }
+    @endphp
+    {!! json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) !!}
     </script>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">

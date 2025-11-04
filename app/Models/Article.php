@@ -25,14 +25,12 @@ class Article extends Model
         'status',
         'published_at',
         'author_id',
-        'view_count',
     ];
 
     protected $casts = [
         'tags' => 'array',
         'featured' => 'boolean',
         'is_published' => 'boolean',
-        'view_count' => 'integer',
         'published_at' => 'datetime',
     ];
 
