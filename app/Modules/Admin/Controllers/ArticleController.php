@@ -13,8 +13,35 @@ class ArticleController extends Controller
 {
     public function index()
     {
-        $articles = Article::with('category', 'author')->paginate(15);
-        return view('admin.articles.index', compact('articles'));
+        $query = Article::with('category', 'author');
+
+        // Apply search filter
+        if (request('search')) {
+            $search = request('search');
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', '%' . $search . '%')
+                  ->orWhere('content', 'like', '%' . $search . '%');
+            });
+        }
+
+        // Apply status filter
+        if (request('status')) {
+            if (request('status') === 'published') {
+                $query->where('is_published', true);
+            } elseif (request('status') === 'draft') {
+                $query->where('is_published', false);
+            }
+        }
+
+        // Apply category filter
+        if (request('category')) {
+            $query->where('article_category_id', request('category'));
+        }
+
+        $articles = $query->paginate(15);
+        $categories = ArticleCategory::orderBy('name')->get();
+        
+        return view('admin.articles.index', compact('articles', 'categories'));
     }
 
     public function create()
