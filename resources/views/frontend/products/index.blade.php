@@ -1,122 +1,121 @@
 <x-frontend-layout>
-    <x-slot name="title">Products - PT Lestari Jaya Bangsa</x-slot>
-    <x-slot name="metaDescription">Explore our range of high-quality herbal and processed food products. All products are BPOM certified and Halal MUI approved.</x-slot>
-    <x-slot name="metaKeywords">herbal products, food products, natural ingredients, BPOM certified, Halal MUI, PT Lestari Jaya Bangsa</x-slot>
+    <x-slot name="title">Produk - PT Lestari Jaya Bangsa</x-slot>
+    <x-slot name="metaDescription">Jelajahi rangkaian produk herbal dan makanan olahan berkualitas tinggi kami. Semua produk bersertifikat BPOM dan Halal MUI.</x-slot>
 
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <!-- Header -->
-        <div class="text-center mb-12">
-            <h1 class="text-4xl font-bold text-gray-900 mb-4">Our Products</h1>
-            <p class="text-xl text-gray-600 max-w-3xl mx-auto">
-                Discover our comprehensive range of herbal and processed food products,
-                all made with natural ingredients and certified for quality and safety.
+    <!-- Page Header -->
+    <section class="bg-gradient-to-r from-primary-600 to-primary-700 text-white py-16 md:py-20">
+        <div class="container-custom text-center">
+            <h1 class="heading-primary text-white mb-4">Produk Kami</h1>
+            <p class="text-xl text-white/90 max-w-3xl mx-auto">
+                Temukan rangkaian lengkap produk herbal dan makanan olahan kami,
+                semua dibuat dengan bahan alami dan bersertifikat untuk kualitas dan keamanan.
             </p>
         </div>
+    </section>
 
-        <!-- Filters and Search -->
-        <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-8">
-            <form method="GET" action="{{ route('products.index') }}" class="flex flex-col sm:flex-row gap-4">
-                <!-- Search -->
-                <div class="flex-1">
-                    <input type="text" name="search" value="{{ request('search') }}"
-                           placeholder="Search products..."
-                           class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
+    <!-- Filters and Search -->
+    <section class="section-sm bg-neutral-50 dark:bg-neutral-900">
+        <div class="container-custom">
+            <form method="GET" action="{{ route('products.index') }}" class="card p-6">
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+                    <!-- Search -->
+                    <div class="md:col-span-2">
+                        <label for="search" class="sr-only">Cari produk</label>
+                        <div class="relative">
+                            <svg class="absolute left-3 top-1/2 transform -translate-y-1/2 w-5 h-5 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                            </svg>
+                            <input type="text" 
+                                   id="search"
+                                   name="search" 
+                                   value="{{ request('search') }}"
+                                   placeholder="Cari produk..."
+                                   class="w-full pl-10 pr-4 py-2.5 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-neutral-800 dark:text-neutral-100">
+                        </div>
+                    </div>
+
+                    <!-- Category Filter -->
+                    <div>
+                        <label for="category" class="sr-only">Kategori</label>
+                        <select name="category" 
+                                id="category"
+                                class="w-full px-4 py-2.5 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-neutral-800 dark:text-neutral-100">
+                            <option value="">Semua Kategori</option>
+                            @foreach($categories ?? [] as $category)
+                                <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
+
+                    <!-- Sort -->
+                    <div>
+                        <label for="sort" class="sr-only">Urutkan</label>
+                        <select name="sort" 
+                                id="sort"
+                                class="w-full px-4 py-2.5 border border-neutral-300 dark:border-neutral-600 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent dark:bg-neutral-800 dark:text-neutral-100">
+                            <option value="name" {{ request('sort', 'name') == 'name' ? 'selected' : '' }}>Nama A-Z</option>
+                            <option value="price" {{ request('sort') == 'price' ? 'selected' : '' }}>Harga</option>
+                            <option value="created" {{ request('sort') == 'created' ? 'selected' : '' }}>Terbaru</option>
+                        </select>
+                    </div>
                 </div>
 
-                <!-- Category Filter -->
-                <div class="w-full sm:w-48">
-                    <select name="category" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                        <option value="">All Categories</option>
-                        @foreach($categories as $category)
-                            <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
-                                {{ $category->name }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
-
-                <!-- Sort -->
-                <div class="w-full sm:w-48">
-                    <select name="sort" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
-                        <option value="name" {{ request('sort', 'name') == 'name' ? 'selected' : '' }}>Name A-Z</option>
-                        <option value="price" {{ request('sort') == 'price' ? 'selected' : '' }}>Price</option>
-                        <option value="created" {{ request('sort') == 'created' ? 'selected' : '' }}>Newest</option>
-                    </select>
-                </div>
-
-                <div class="flex gap-2">
-                    <button type="submit" class="flex-1 sm:flex-none bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium">
+                <div class="flex flex-col sm:flex-row gap-3 mt-4">
+                    <button type="submit" class="btn btn-primary flex-1 sm:flex-none">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"></path>
+                        </svg>
                         Filter
                     </button>
 
                     @if(request()->hasAny(['search', 'category', 'sort']))
-                        <a href="{{ route('products.index') }}" class="flex-1 sm:flex-none bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors font-medium text-center">
-                            Clear
+                        <a href="{{ route('products.index') }}" class="btn btn-outline flex-1 sm:flex-none">
+                            Hapus Filter
                         </a>
                     @endif
                 </div>
             </form>
         </div>
+    </section>
 
-        <!-- Products Grid -->
-        @if($products->count() > 0)
-            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 mb-8">
-                @foreach($products as $product)
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                    <div class="aspect-w-1 aspect-h-1 bg-gray-200">
-                        @if($product->getFirstMediaUrl('images'))
-                            <img src="{{ $product->getFirstMediaUrl('images') }}" alt="{{ $product->name }}" class="w-full h-48 object-cover" loading="lazy">
-                        @else
-                            <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
-                                <span class="text-gray-400">No Image</span>
-                            </div>
-                        @endif
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-2">{{ $product->name }}</h3>
-                        <p class="text-gray-600 text-sm mb-3 line-clamp-2">{{ $product->description }}</p>
-
-                        <!-- Certifications -->
-                        <div class="flex flex-wrap gap-1 mb-3">
-                            @if($product->is_halal_certified)
-                                <span class="inline-block bg-green-100 text-green-800 text-xs px-2 py-1 rounded-full">Halal MUI</span>
-                            @endif
-                            @if($product->is_bpom_certified)
-                                <span class="inline-block bg-blue-100 text-blue-800 text-xs px-2 py-1 rounded-full">BPOM</span>
-                            @endif
-                            @if($product->is_natural)
-                                <span class="inline-block bg-yellow-100 text-yellow-800 text-xs px-2 py-1 rounded-full">100% Natural</span>
-                            @endif
+    <!-- Products Grid -->
+    <section class="section bg-white dark:bg-neutral-50">
+        <div class="container-custom">
+            @if(isset($products) && $products->count() > 0)
+                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 mb-12">
+                    @foreach($products as $index => $product)
+                        <div class="animate-fade-in-up" style="animation-delay: {{ min($index * 0.1, 0.5) }}s">
+                            <x-card-product :product="$product" />
                         </div>
-
-                        <div class="flex justify-between items-center">
-                            @if($product->price)
-                                <span class="text-green-600 font-semibold text-lg">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
-                            @else
-                                <span class="text-gray-500 text-sm">Contact for price</span>
-                            @endif
-                            <a href="{{ route('products.show', $product->slug) }}" class="bg-green-600 text-white px-4 py-2 rounded-md text-sm hover:bg-green-700 transition-colors">
-                                View Details
-                            </a>
-                        </div>
-                    </div>
+                    @endforeach
                 </div>
-                @endforeach
-            </div>
 
-            <!-- Pagination -->
-            <div class="flex justify-center">
-                {{ $products->appends(request()->query())->links() }}
-            </div>
-        @else
-            <div class="text-center py-12">
-                <div class="text-6xl mb-4">🔍</div>
-                <h3 class="text-xl font-semibold text-gray-900 mb-2">No products found</h3>
-                <p class="text-gray-600 mb-6">Try adjusting your search criteria or browse all products.</p>
-                <a href="{{ route('products.index') }}" class="bg-green-600 text-white px-6 py-3 rounded-lg hover:bg-green-700">
-                    View All Products
-                </a>
-            </div>
-        @endif
-    </div>
+                <!-- Pagination -->
+                @if(method_exists($products, 'links'))
+                    <div class="flex justify-center">
+                        {{ $products->appends(request()->query())->links() }}
+                    </div>
+                @endif
+            @else
+                <div class="text-center py-16">
+                    <div class="w-24 h-24 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <svg class="w-12 h-12 text-neutral-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-2xl font-heading font-semibold text-neutral-900 dark:text-neutral-100 mb-3">
+                        Produk Tidak Ditemukan
+                    </h3>
+                    <p class="text-body mb-8 max-w-md mx-auto">
+                        Coba sesuaikan kriteria pencarian Anda atau jelajahi semua produk.
+                    </p>
+                    <a href="{{ route('products.index') }}" class="btn btn-primary">
+                        Lihat Semua Produk
+                    </a>
+                </div>
+            @endif
+        </div>
+    </section>
 </x-frontend-layout>
