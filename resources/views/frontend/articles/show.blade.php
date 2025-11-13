@@ -1,137 +1,89 @@
-<x-frontend-layout>
-    <x-slot name="title">{{ $article->title }} - PT Lestari Jaya Bangsa</x-slot>
-    <x-slot name="metaDescription">{{ $article->excerpt ?? \Illuminate\Support\Str::limit(strip_tags($article->content), 160) }}</x-slot>
-
-    <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <!-- Breadcrumb -->
-        <nav class="flex mb-8" aria-label="Breadcrumb">
-            <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                <li class="inline-flex items-center">
-                    <a href="{{ route('home') }}" class="text-gray-700 hover:text-green-600">Home</a>
-                </li>
-                <li>
-                    <div class="flex items-center">
-                        <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
-                        </svg>
-                        <a href="{{ route('articles.index') }}" class="text-gray-700 hover:text-green-600 ml-1 md:ml-2">Articles</a>
-                    </div>
-                </li>
-                <li aria-current="page">
-                    <div class="flex items-center">
-                        <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
-                        </svg>
-                        <span class="text-gray-500 ml-1 md:ml-2">{{ \Illuminate\Support\Str::limit($article->title, 30) }}</span>
-                    </div>
-                </li>
-            </ol>
-        </nav>
-
-        <!-- Article Header -->
-        <header class="mb-8">
-            @if($article->category)
-                <div class="text-green-600 font-medium mb-2">{{ $article->category->name }}</div>
-            @endif
-
-            <h1 class="text-3xl md:text-4xl font-bold text-gray-900 mb-4">{{ $article->title }}</h1>
-
-            @if($article->excerpt)
-                <p class="text-xl text-gray-600 mb-6">{{ $article->excerpt }}</p>
-            @endif
-
-            <div class="flex items-center text-sm text-gray-500 border-b border-gray-200 pb-6">
-                @if($article->author)
-                    <span class="font-medium text-gray-900">{{ $article->author->name }}</span>
-                    <span class="mx-2">•</span>
-                @endif
-                <time datetime="{{ $article->published_at->toISOString() }}">
-                    {{ $article->published_at->format('F d, Y') }}
-                </time>
-                @if($article->tags && count($article->tags) > 0)
-                    <span class="mx-2">•</span>
-                    <div class="flex gap-1 flex-wrap">
-                        @foreach($article->tags as $tag)
-                            <a href="{{ route('articles.index', ['tag' => is_array($tag) ? $tag['name'] : $tag->name ?? $tag]) }}"
-                               class="text-green-600 hover:text-green-700">#{{ is_array($tag) ? $tag['name'] : $tag->name ?? $tag }}</a>
-                            @if(!$loop->last)
-                                <span>,</span>
-                            @endif
-                        @endforeach
-                    </div>
-                @endif
-            </div>
-        </header>
-
-        <!-- Featured Image -->
-        @if($article->featured_image)
-            <div class="mb-8">
-                <img src="{{ asset('storage/' . $article->featured_image) }}" alt="{{ $article->title }}" class="w-full rounded-lg shadow-md" loading="lazy">
-            </div>
-        @endif
-
-        <!-- Article Content -->
-        <div class="prose prose-lg prose-gray max-w-none mb-12">
-            {!! $article->content !!}
-        </div>
-
-        <!-- Share Buttons -->
-        <div class="border-t border-gray-200 pt-6 mb-12">
-            <h3 class="text-lg font-semibold text-gray-900 mb-4">Share this article</h3>
-            <div class="flex gap-4">
-                <a href="https://twitter.com/intent/tweet?text={{ urlencode($article->title) }}&url={{ urlencode(route('articles.show', $article->slug)) }}"
-                   target="_blank" class="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
-                    Twitter
-                </a>
-                <a href="https://www.facebook.com/sharer/sharer.php?u={{ urlencode(route('articles.show', $article->slug)) }}"
-                   target="_blank" class="bg-blue-700 text-white px-4 py-2 rounded-lg hover:bg-blue-800 transition-colors">
-                    Facebook
-                </a>
-                <a href="https://wa.me/?text={{ urlencode($article->title . ' ' . route('articles.show', $article->slug)) }}"
-                   target="_blank" class="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600 transition-colors">
-                    WhatsApp
-                </a>
-            </div>
-        </div>
-
-        <!-- Related Articles -->
-        @if($relatedArticles->count() > 0)
-        <div class="border-t border-gray-200 pt-12">
-            <h3 class="text-2xl font-bold text-gray-900 mb-8">Related Articles</h3>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                @foreach($relatedArticles as $relatedArticle)
-                <article class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                    @if($relatedArticle->featured_image)
-                        <img src="{{ asset('storage/' . $relatedArticle->featured_image) }}" alt="{{ $relatedArticle->title }}" class="w-full h-32 object-cover" loading="lazy">
-                    @else
-                        <div class="w-full h-32 bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
-                            <span class="text-green-400 text-2xl">📰</span>
-                        </div>
-                    @endif
-                    <div class="p-4">
-                        <h4 class="text-sm font-semibold text-gray-900 mb-2 line-clamp-2">
-                            <a href="{{ route('articles.show', $relatedArticle->slug) }}" class="hover:text-green-600 transition-colors">
-                                {{ $relatedArticle->title }}
-                            </a>
-                        </h4>
-                        <div class="text-xs text-gray-500">
-                            {{ $relatedArticle->published_at->format('M d, Y') }}
-                        </div>
-                    </div>
-                </article>
-                @endforeach
-            </div>
-        </div>
-        @endif
-
-        <!-- Back to Articles -->
-        <div class="text-center mt-12">
-            <a href="{{ route('articles.index') }}" class="inline-flex items-center text-green-600 hover:text-green-700 font-medium">
-                <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+<x-layouts.app>
+    @section('title', ($article->title ?? 'Artikel') . ' - PT Lestari Jaya Bangsa')
+    
+    <!-- Breadcrumb -->
+    <section class="bg-gray-100 py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="flex items-center space-x-2 text-sm text-gray-600">
+                <a href="{{ route('home') }}" class="hover:text-green-600">Beranda</a>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                 </svg>
-                Back to Articles
-            </a>
+                <a href="{{ route('articles.index') }}" class="hover:text-green-600">Artikel</a>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+                <span class="text-gray-900 font-medium line-clamp-1">{{ $article->title ?? 'Detail Artikel' }}</span>
+            </nav>
         </div>
-    </div>
-</x-frontend-layout>
+    </section>
+
+    <!-- Article Content -->
+    <article class="py-16 bg-white">
+        <div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
+            <!-- Header -->
+            <header class="mb-8">
+                @if($article->featured_image ?? null)
+                    <div class="rounded-2xl overflow-hidden shadow-xl mb-8">
+                        <img src="{{ $article->featured_image }}" 
+                             alt="{{ $article->title }}"
+                             class="w-full h-auto object-cover">
+                    </div>
+                @endif
+                
+                <div class="flex items-center text-sm text-gray-500 mb-4">
+                    <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
+                    </svg>
+                    <time datetime="{{ $article->created_at->format('Y-m-d') }}">
+                        {{ $article->created_at->format('d F Y') }}
+                    </time>
+                    <span class="mx-2">•</span>
+                    <span>{{ $article->author ?? 'Admin' }}</span>
+                </div>
+                
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+                    {{ $article->title ?? 'Judul Artikel' }}
+                </h1>
+                
+                @if($article->excerpt ?? null)
+                    <p class="text-xl text-gray-600 leading-relaxed">
+                        {{ $article->excerpt }}
+                    </p>
+                @endif
+            </header>
+            
+            <!-- Content -->
+            <div class="prose prose-lg max-w-none">
+                <div class="text-gray-700 leading-relaxed">
+                    {!! $article->content ?? 'Konten artikel tidak tersedia.' !!}
+                </div>
+            </div>
+            
+            <!-- Back Button -->
+            <div class="mt-12 pt-8 border-t border-gray-200">
+                <a href="{{ route('articles.index') }}" 
+                   class="inline-flex items-center text-green-600 font-semibold hover:text-green-700 transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                    Kembali ke Berita
+                </a>
+            </div>
+        </div>
+    </article>
+
+    <!-- Related Articles -->
+    @if(isset($relatedArticles) && $relatedArticles->count() > 0)
+        <section class="py-16 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-8">Artikel Terkait</h2>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    @foreach($relatedArticles->take(3) as $relatedArticle)
+                        <x-card-article :article="$relatedArticle" />
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+</x-layouts.app>

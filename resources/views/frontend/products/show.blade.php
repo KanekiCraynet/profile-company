@@ -1,253 +1,120 @@
-<x-frontend-layout>
-    <x-slot name="title">{{ $product->name }} - Products | PT Lestari Jaya Bangsa</x-slot>
-    <x-slot name="metaDescription">{{ \Illuminate\Support\Str::limit(strip_tags($product->description ?? ''), 160) }}</x-slot>
-
-    <!-- Schema.org Product Markup -->
-    <script type="application/ld+json">
-    @php
-        $schema = [
-            "@context" => "https://schema.org",
-            "@type" => "Product",
-            "name" => $product->name,
-            "description" => strip_tags($product->description ?? ''),
-            "brand" => [
-                "@type" => "Brand",
-                "name" => "PT Lestari Jaya Bangsa"
-            ],
-            "url" => route('products.show', $product->slug)
-        ];
-        
-        if ($product->getFirstMediaUrl('images')) {
-            $schema["image"] = $product->getFirstMediaUrl('images');
-        }
-        
-        if ($product->price) {
-            $schema["offers"] = [
-                "@type" => "Offer",
-                "price" => (string) $product->price,
-                "priceCurrency" => "IDR",
-                "availability" => $product->stock_quantity > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock'
-            ];
-        }
-        
-        if ($product->category) {
-            $schema["category"] = $product->category->name;
-        }
-        
-        if ($product->is_halal_certified) {
-            $schema["additionalProperty"] = [
-                [
-                    "@type" => "PropertyValue",
-                    "name" => "Halal Certification",
-                    "value" => "MUI Certified"
-                ]
-            ];
-        }
-    @endphp
-    {!! json_encode($schema, JSON_UNESCAPED_SLASHES | JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE) !!}
-    </script>
-
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <!-- Breadcrumb -->
-        <nav class="flex mb-8" aria-label="Breadcrumb">
-            <ol class="inline-flex items-center space-x-1 md:space-x-3">
-                <li class="inline-flex items-center">
-                    <a href="{{ route('home') }}" class="text-gray-700 hover:text-green-600">Home</a>
-                </li>
-                <li>
-                    <div class="flex items-center">
-                        <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
-                        </svg>
-                        <a href="{{ route('products.index') }}" class="text-gray-700 hover:text-green-600 ml-1 md:ml-2">Products</a>
-                    </div>
-                </li>
-                <li aria-current="page">
-                    <div class="flex items-center">
-                        <svg class="w-3 h-3 text-gray-400 mx-1" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
-                        </svg>
-                        <span class="text-gray-500 ml-1 md:ml-2">{{ $product->name }}</span>
-                    </div>
-                </li>
-            </ol>
-        </nav>
-
-        <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
-            <!-- Product Images -->
-            <div>
-                <div class="aspect-w-1 aspect-h-1 bg-gray-200 rounded-lg overflow-hidden mb-4" id="main-image-container">
-                    @if($product->getFirstMediaUrl('images'))
-                        <img id="main-product-image" src="{{ $product->getFirstMediaUrl('images') }}" alt="{{ $product->name }}" class="w-full h-96 object-cover">
-                    @else
-                        <div class="w-full h-96 bg-gray-200 flex items-center justify-center">
-                            <span class="text-gray-400 text-lg">No Image Available</span>
-                        </div>
-                    @endif
-                </div>
-
-                <!-- Additional Images Gallery -->
-                @if($product->getMedia('images')->count() > 1)
-                    <div class="grid grid-cols-3 sm:grid-cols-4 gap-2">
-                        @foreach($product->getMedia('images') as $index => $media)
-                            <button type="button" 
-                                    onclick="changeMainImage('{{ $media->getUrl() }}', this)"
-                                    class="focus:outline-none focus:ring-2 focus:ring-green-500 rounded overflow-hidden">
-                                <img src="{{ $media->getUrl() }}" 
-                                     alt="{{ $product->name }} - Image {{ $index + 1 }}" 
-                                     class="w-full h-16 sm:h-20 object-cover rounded cursor-pointer hover:opacity-80 border-2 transition-all {{ $index === 0 ? 'border-green-500' : 'border-transparent hover:border-green-300' }}"
-                                     loading="lazy">
-                            </button>
-                        @endforeach
-                    </div>
-                @endif
-            </div>
-
-            <script>
-                function changeMainImage(imageUrl, thumbElement) {
-                    const mainImage = document.getElementById('main-product-image');
-                    if (mainImage) {
-                        mainImage.src = imageUrl;
-                    }
-                    // Update border on thumbnails
-                    if (thumbElement && thumbElement.querySelector('img')) {
-                        document.querySelectorAll('#main-image-container ~ .grid img').forEach(img => {
-                            img.classList.remove('border-green-500');
-                            img.classList.add('border-transparent');
-                        });
-                        const thumbImg = thumbElement.querySelector('img');
-                        if (thumbImg) {
-                            thumbImg.classList.remove('border-transparent');
-                            thumbImg.classList.add('border-green-500');
-                        }
-                    }
-                }
-            </script>
-
-            <!-- Product Info -->
-            <div>
-                <h1 class="text-3xl font-bold text-gray-900 mb-4">{{ $product->name }}</h1>
-
-                <!-- Certifications -->
-                <div class="flex flex-wrap gap-2 mb-6">
-                    @if($product->is_halal_certified)
-                        <span class="inline-flex items-center bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
-                            🕌 Halal MUI Certified
-                        </span>
-                    @endif
-                    @if($product->is_bpom_certified)
-                        <span class="inline-flex items-center bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                            🏥 BPOM Approved
-                        </span>
-                    @endif
-                    @if($product->is_natural)
-                        <span class="inline-flex items-center bg-yellow-100 text-yellow-800 px-3 py-1 rounded-full text-sm font-medium">
-                            🌿 100% Natural Ingredients
-                        </span>
-                    @endif
-                </div>
-
-                <!-- Price -->
-                @if($product->price)
-                <div class="text-3xl font-bold text-green-600 mb-6">
-                    Rp {{ number_format($product->price, 0, ',', '.') }}
-                </div>
-                @else
-                <div class="text-lg text-gray-600 mb-6">
-                    <a href="{{ route('contact') }}" class="text-green-600 hover:text-green-700 underline">Contact us for pricing</a>
-                </div>
-                @endif
-
-                <!-- Category -->
-                @if($product->category)
-                    <div class="mb-6">
-                        <span class="text-sm text-gray-600">Category:</span>
-                        <span class="text-sm font-medium text-gray-900 ml-2">{{ $product->category->name }}</span>
-                    </div>
-                @endif
-
-                <!-- Description -->
-                @if($product->description)
-                <div class="prose prose-gray max-w-none mb-8">
-                    <h3 class="text-lg font-semibold text-gray-900 mb-3">Product Description</h3>
-                    <div class="text-gray-700 leading-relaxed">
-                        {!! nl2br(e($product->description)) !!}
-                    </div>
-                </div>
-                @endif
-
-                <!-- Benefits -->
-                @if($product->benefits)
-                    <div class="bg-green-50 rounded-lg p-6 mb-8">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Benefits</h3>
-                        <div class="text-gray-700">
-                            {!! nl2br(e($product->benefits)) !!}
-                        </div>
-                    </div>
-                @endif
-
-                <!-- Usage Instructions -->
-                @if($product->usage_instructions)
-                    <div class="bg-blue-50 rounded-lg p-6 mb-8">
-                        <h3 class="text-lg font-semibold text-gray-900 mb-3">Usage Instructions</h3>
-                        <div class="text-gray-700">
-                            {!! nl2br(e($product->usage_instructions)) !!}
-                        </div>
-                    </div>
-                @endif
-
-                <!-- Stock Status -->
-                <div class="mb-6">
-                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
-                        {{ $product->stock_quantity > 0 ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800' }}">
-                        {{ $product->stock_quantity > 0 ? 'In Stock' : 'Out of Stock' }}
-                        @if($product->stock_quantity > 0)
-                            ({{ $product->stock_quantity }} available)
-                        @endif
-                    </span>
-                </div>
-            </div>
+<x-layouts.app>
+    @section('title', ($product->name ?? 'Produk') . ' - PT Lestari Jaya Bangsa')
+    
+    <!-- Breadcrumb -->
+    <section class="bg-gray-100 py-4">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <nav class="flex items-center space-x-2 text-sm text-gray-600">
+                <a href="{{ route('home') }}" class="hover:text-green-600">Beranda</a>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+                <a href="{{ route('products.index') }}" class="hover:text-green-600">Produk</a>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+                <span class="text-gray-900 font-medium">{{ $product->name ?? 'Detail Produk' }}</span>
+            </nav>
         </div>
+    </section>
 
-        <!-- Related Products -->
-        @if($relatedProducts->count() > 0)
-        <div class="mt-16">
-            <h2 class="text-2xl font-bold text-gray-900 mb-8">Related Products</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                @foreach($relatedProducts as $relatedProduct)
-                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
-                    <div class="aspect-w-1 aspect-h-1 bg-gray-200">
-                        @if($relatedProduct->getFirstMediaUrl('images'))
-                            <img src="{{ $relatedProduct->getFirstMediaUrl('images') }}" alt="{{ $relatedProduct->name }}" class="w-full h-32 object-cover" loading="lazy">
+    <!-- Product Detail Section -->
+    <section class="py-16 bg-white">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <!-- Product Images -->
+                <div>
+                    <div class="sticky top-24">
+                        @if($product->getFirstMediaUrl('images'))
+                            <div class="rounded-2xl overflow-hidden shadow-xl mb-4">
+                                <img src="{{ $product->getFirstMediaUrl('images') }}" 
+                                     alt="{{ $product->name }}"
+                                     class="w-full h-auto object-cover">
+                            </div>
                         @else
-                            <div class="w-full h-32 bg-gray-200 flex items-center justify-center">
-                                <span class="text-gray-400 text-sm">No Image</span>
+                            <div class="rounded-2xl overflow-hidden shadow-xl mb-4 aspect-square bg-gradient-to-br from-green-100 to-green-200 flex items-center justify-center">
+                                <svg class="w-32 h-32 text-green-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"></path>
+                                </svg>
                             </div>
                         @endif
-                    </div>
-                    <div class="p-4">
-                        <h3 class="text-sm font-semibold text-gray-900 mb-1">{{ $relatedProduct->name }}</h3>
-                        @if($relatedProduct->price)
-                            <p class="text-green-600 font-semibold text-sm mb-2">Rp {{ number_format($relatedProduct->price, 0, ',', '.') }}</p>
-                        @else
-                            <p class="text-gray-500 text-xs mb-2">Contact for price</p>
-                        @endif
-                        <div class="flex flex-wrap gap-1 mb-2">
-                            @if($relatedProduct->is_halal_certified)
-                                <span class="inline-block bg-green-100 text-green-800 text-xs px-1.5 py-0.5 rounded">Halal</span>
+                        
+                        <!-- Certification Badges -->
+                        <div class="flex flex-wrap gap-3">
+                            @if($product->is_halal ?? false)
+                                <div class="flex items-center space-x-2 bg-green-50 border border-green-200 px-4 py-2 rounded-lg">
+                                    <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path d="M10.394 2.08a1 1 0 00-.788 0l-7 3a1 1 0 000 1.84L5.25 8.051a.999.999 0 01.356-.257l4-1.714a1 1 0 11.788 1.838L7.667 9.088l1.94.831a1 1 0 00.787 0l7-3a1 1 0 000-1.838l-7-3z"></path>
+                                    </svg>
+                                    <span class="font-semibold text-green-700">Halal MUI</span>
+                                </div>
                             @endif
-                            @if($relatedProduct->is_bpom_certified)
-                                <span class="inline-block bg-blue-100 text-blue-800 text-xs px-1.5 py-0.5 rounded">BPOM</span>
+                            @if($product->has_bpom ?? false)
+                                <div class="flex items-center space-x-2 bg-blue-50 border border-blue-200 px-4 py-2 rounded-lg">
+                                    <svg class="w-5 h-5 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                                        <path fill-rule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+                                    </svg>
+                                    <span class="font-semibold text-blue-700">BPOM Certified</span>
+                                </div>
                             @endif
                         </div>
-                        <a href="{{ route('products.show', $relatedProduct->slug) }}" class="text-green-600 text-sm hover:text-green-700 font-medium">
-                            View Details →
+                    </div>
+                </div>
+                
+                <!-- Product Info -->
+                <div class="space-y-6">
+                    <div>
+                        @if($product->category ?? null)
+                            <span class="inline-block bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-medium mb-3">
+                                {{ $product->category }}
+                            </span>
+                        @endif
+                        <h1 class="text-4xl font-bold text-gray-900 mb-4">{{ $product->name ?? 'Nama Produk' }}</h1>
+                    </div>
+                    
+                    <div class="prose max-w-none text-gray-600 leading-relaxed">
+                        {!! $product->description ?? 'Deskripsi produk tidak tersedia.' !!}
+                    </div>
+                    
+                    @if($product->ingredients ?? null)
+                        <div class="border-t border-gray-200 pt-6">
+                            <h3 class="text-xl font-bold text-gray-900 mb-3">Komposisi</h3>
+                            <p class="text-gray-600">{{ $product->ingredients }}</p>
+                        </div>
+                    @endif
+                    
+                    @if($product->usage ?? null)
+                        <div class="border-t border-gray-200 pt-6">
+                            <h3 class="text-xl font-bold text-gray-900 mb-3">Cara Penggunaan</h3>
+                            <p class="text-gray-600 whitespace-pre-line">{{ $product->usage }}</p>
+                        </div>
+                    @endif
+                    
+                    <div class="border-t border-gray-200 pt-6">
+                        <a href="{{ route('contact') }}" 
+                           class="inline-flex items-center bg-gradient-to-r from-green-600 to-green-700 text-white px-8 py-4 rounded-lg text-lg font-semibold hover:from-green-700 hover:to-green-800 shadow-lg hover:shadow-xl transform hover:-translate-y-1 transition-all duration-200">
+                            Hubungi Kami untuk Pemesanan
+                            <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                            </svg>
                         </a>
                     </div>
                 </div>
-                @endforeach
             </div>
         </div>
-        @endif
-    </div>
-</x-frontend-layout>
+    </section>
+
+    <!-- Related Products -->
+    @if(isset($relatedProducts) && $relatedProducts->count() > 0)
+        <section class="py-16 bg-gray-50">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <h2 class="text-3xl font-bold text-gray-900 mb-8">Produk Serupa</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    @foreach($relatedProducts->take(3) as $relatedProduct)
+                        <x-card-product :product="$relatedProduct" />
+                    @endforeach
+                </div>
+            </div>
+        </section>
+    @endif
+</x-layouts.app>
