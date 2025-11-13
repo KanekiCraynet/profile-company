@@ -359,5 +359,4 @@
         setInterval(() => lucide.createIcons(), 1000);
     </script>
 </x-admin-layout>
-</x-admin-layout>
 
