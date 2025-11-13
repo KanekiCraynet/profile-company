@@ -1535,6 +1535,499 @@ main {
     @apply border-l-4 border-green-500 pl-4 italic my-4 text-gray-600;
 }
 
+/* Enhanced Modern Design System */
+:root {
+    /* Modern Accent Colors */
+    --accent-emerald: #10b981;
+    --accent-emerald-light: #d1fae5;
+    --accent-blue: #3b82f6;
+    --accent-blue-light: #dbeafe;
+    --accent-purple: #8b5cf6;
+    --accent-purple-light: #e9d5ff;
+    --accent-orange: #f97316;
+    --accent-orange-light: #fed7aa;
+
+    /* Modern Status Colors */
+    --status-success: #10b981;
+    --status-success-bg: #d1fae5;
+    --status-warning: #eab308;
+    --status-warning-bg: #fef3c7;
+    --status-error: #ef4444;
+    --status-error-bg: #fee2e2;
+    --status-info: #06b6d4;
+    --status-info-bg: #cffafe;
+
+    /* Enhanced Gradients */
+    --gradient-modern-primary: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+    --gradient-modern-secondary: linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%);
+    --gradient-modern-accent: linear-gradient(135deg, #8b5cf6 0%, #7c3aed 50%, #6d28d9 100%);
+    --gradient-modern-emerald: linear-gradient(135deg, #34d399 0%, #10b981 50%, #059669 100%);
+    --gradient-modern-blue: linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%);
+    --gradient-modern-purple: linear-gradient(135deg, #a78bfa 0%, #8b5cf6 50%, #7c3aed 100%);
+    --gradient-modern-orange: linear-gradient(135deg, #fb923c 0%, #f97316 50%, #ea580c 100%);
+    --gradient-modern-slate: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 50%, #e2e8f0 100%);
+
+    /* Professional Shadow System */
+    --shadow-modern-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-modern: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-modern-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-modern-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+    --shadow-modern-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    --shadow-modern-inner: inset 0 2px 4px 0 rgba(0, 0, 0, 0.06);
+
+    /* Modern Colored Shadows */
+    --shadow-emerald: 0 20px 25px -5px rgba(16, 185, 129, 0.15), 0 10px 10px -5px rgba(16, 185, 129, 0.04);
+    --shadow-blue: 0 20px 25px -5px rgba(59, 130, 246, 0.15), 0 10px 10px -5px rgba(59, 130, 246, 0.04);
+    --shadow-purple: 0 20px 25px -5px rgba(139, 92, 246, 0.15), 0 10px 10px -5px rgba(139, 92, 246, 0.04);
+    --shadow-orange: 0 20px 25px -5px rgba(249, 115, 22, 0.15), 0 10px 10px -5px rgba(249, 115, 22, 0.04);
+
+    /* Enhanced Border Radius */
+    --radius-modern-sm: 0.5rem;
+    --radius-modern: 0.75rem;
+    --radius-modern-md: 1rem;
+    --radius-modern-lg: 1.25rem;
+    --radius-modern-xl: 1.5rem;
+    --radius-modern-2xl: 2rem;
+
+    /* Modern Animation Curves */
+    --ease-modern: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-modern-in: cubic-bezier(0.4, 0, 1, 1);
+    --ease-modern-out: cubic-bezier(0, 0, 0.2, 1);
+    --ease-modern-in-out: cubic-bezier(0.4, 0, 0.2, 1);
+    --ease-bounce: cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* Enhanced Modern Animations */
+@keyframes shimmer-modern {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+@keyframes float {
+    0%, 100% {
+        transform: translateY(0px);
+    }
+    50% {
+        transform: translateY(-10px);
+    }
+}
+
+@keyframes wiggle {
+    0%, 7% {
+        transform: rotateZ(0);
+    }
+    15% {
+        transform: rotateZ(-15deg);
+    }
+    20% {
+        transform: rotateZ(10deg);
+    }
+    25% {
+        transform: rotateZ(-10deg);
+    }
+    30% {
+        transform: rotateZ(6deg);
+    }
+    35% {
+        transform: rotateZ(-4deg);
+    }
+    40%, 100% {
+        transform: rotateZ(0);
+    }
+}
+
+@keyframes glow {
+    0%, 100% {
+        box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+    }
+    50% {
+        box-shadow: 0 0 30px rgba(16, 185, 129, 0.6);
+    }
+}
+
+@keyframes heartbeat {
+    0%, 14%, 28%, 42%, 70% {
+        transform: scale(1);
+    }
+    7%, 21%, 35% {
+        transform: scale(1.1);
+    }
+    49% {
+        transform: scale(1.2);
+    }
+    56% {
+        transform: scale(1.1);
+    }
+    63% {
+        transform: scale(1);
+    }
+}
+
+@keyframes ripple {
+    0% {
+        transform: scale(0.8);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(2.4);
+        opacity: 0;
+    }
+}
+
+@keyframes slide-in-up-enhanced {
+    from {
+        transform: translateY(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slide-in-down-enhanced {
+    from {
+        transform: translateY(-30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slide-in-right-enhanced {
+    from {
+        transform: translateX(30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slide-in-left-enhanced {
+    from {
+        transform: translateX(-30px);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes scale-in-enhanced {
+    from {
+        transform: scale(0.9);
+        opacity: 0;
+    }
+    to {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes bounce-in-enhanced {
+    0% {
+        transform: scale(0.8);
+        opacity: 0;
+    }
+    50% {
+        transform: scale(1.08);
+    }
+    100% {
+        transform: scale(1);
+        opacity: 1;
+    }
+}
+
+@keyframes fade-in-enhanced {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes typewriter {
+    from {
+        width: 0;
+    }
+    to {
+        width: 100%;
+    }
+}
+
+@keyframes blink {
+    0%, 50% {
+        border-color: transparent;
+    }
+    51%, 100% {
+        border-color: currentColor;
+    }
+}
+
+/* Modern Animation Classes */
+.animate-float {
+    animation: float 3s ease-in-out infinite;
+}
+
+.animate-wiggle {
+    animation: wiggle 2s ease-in-out infinite;
+}
+
+.animate-glow {
+    animation: glow 2s ease-in-out infinite;
+}
+
+.animate-heartbeat {
+    animation: heartbeat 2s ease-in-out infinite;
+}
+
+.animate-ripple {
+    animation: ripple 0.6s ease-out;
+}
+
+.animate-shimmer-modern {
+    background: linear-gradient(
+        90deg,
+        transparent,
+        rgba(255, 255, 255, 0.4),
+        transparent
+    );
+    background-size: 1000px 100%;
+    animation: shimmer-modern 2s infinite;
+}
+
+.animate-slide-in-up-enhanced {
+    animation: slide-in-up-enhanced 0.6s var(--ease-modern-out);
+}
+
+.animate-slide-in-down-enhanced {
+    animation: slide-in-down-enhanced 0.6s var(--ease-modern-out);
+}
+
+.animate-slide-in-right-enhanced {
+    animation: slide-in-right-enhanced 0.6s var(--ease-modern-out);
+}
+
+.animate-slide-in-left-enhanced {
+    animation: slide-in-left-enhanced 0.6s var(--ease-modern-out);
+}
+
+.animate-scale-in-enhanced {
+    animation: scale-in-enhanced 0.4s var(--ease-bounce);
+}
+
+.animate-bounce-in-enhanced {
+    animation: bounce-in-enhanced 0.6s var(--ease-bounce);
+}
+
+.animate-fade-in-enhanced {
+    animation: fade-in-enhanced 0.5s var(--ease-modern-out);
+}
+
+.animate-typewriter {
+    overflow: hidden;
+    border-right: 2px solid;
+    white-space: nowrap;
+    animation: typewriter 4s steps(40) 1s 1 normal both,
+               blink 1s steps(1) infinite;
+}
+
+/* Animation Delay Utilities */
+.animate-delay-100 { animation-delay: 100ms; }
+.animate-delay-200 { animation-delay: 200ms; }
+.animate-delay-300 { animation-delay: 300ms; }
+.animate-delay-500 { animation-delay: 500ms; }
+.animate-delay-700 { animation-delay: 700ms; }
+.animate-delay-1000 { animation-delay: 1000ms; }
+
+/* Modern Component Classes */
+.card-modern {
+    @apply bg-white rounded-2xl shadow-lg border border-gray-100 p-6 transition-all duration-300 hover:shadow-xl hover:-translate-y-1;
+}
+
+.card-modern-emerald {
+    @apply bg-gradient-to-br from-white to-emerald-50 rounded-2xl shadow-lg border border-emerald-100 p-6 transition-all duration-300 hover:shadow-emerald hover:-translate-y-1;
+}
+
+.card-modern-blue {
+    @apply bg-gradient-to-br from-white to-blue-50 rounded-2xl shadow-lg border border-blue-100 p-6 transition-all duration-300 hover:shadow-blue hover:-translate-y-1;
+}
+
+.card-modern-purple {
+    @apply bg-gradient-to-br from-white to-purple-50 rounded-2xl shadow-lg border border-purple-100 p-6 transition-all duration-300 hover:shadow-purple hover:-translate-y-1;
+}
+
+.card-modern-orange {
+    @apply bg-gradient-to-br from-white to-orange-50 rounded-2xl shadow-lg border border-orange-100 p-6 transition-all duration-300 hover:shadow-orange hover:-translate-y-1;
+}
+
+/* Modern Button Classes */
+.btn-modern {
+    @apply px-6 py-3 rounded-xl font-semibold transition-all duration-300 transform hover:scale-105 focus:outline-none focus:ring-2 focus:ring-offset-2;
+}
+
+.btn-modern-emerald {
+    @apply bg-gradient-to-r from-emerald-600 to-emerald-700 text-white hover:from-emerald-700 hover:to-emerald-800 shadow-lg hover:shadow-emerald focus:ring-emerald-500;
+}
+
+.btn-modern-blue {
+    @apply bg-gradient-to-r from-blue-600 to-blue-700 text-white hover:from-blue-700 hover:to-blue-800 shadow-lg hover:shadow-blue focus:ring-blue-500;
+}
+
+.btn-modern-purple {
+    @apply bg-gradient-to-r from-purple-600 to-purple-700 text-white hover:from-purple-700 hover:to-purple-800 shadow-lg hover:shadow-purple focus:ring-purple-500;
+}
+
+.btn-modern-orange {
+    @apply bg-gradient-to-r from-orange-600 to-orange-700 text-white hover:from-orange-700 hover:to-orange-800 shadow-lg hover:shadow-orange focus:ring-orange-500;
+}
+
+/* Modern Input Classes */
+.input-modern {
+    @apply w-full px-4 py-3 border border-gray-300 rounded-xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent transition-all duration-200;
+}
+
+.input-modern-emerald {
+    @apply focus:ring-emerald-500 focus:border-emerald-500;
+}
+
+.input-modern-blue {
+    @apply focus:ring-blue-500 focus:border-blue-500;
+}
+
+.input-modern-purple {
+    @apply focus:ring-purple-500 focus:border-purple-500;
+}
+
+.input-modern-orange {
+    @apply focus:ring-orange-500 focus:border-orange-500;
+}
+
+/* Modern Badge Classes */
+.badge-modern {
+    @apply inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold;
+}
+
+.badge-modern-emerald {
+    @apply bg-emerald-100 text-emerald-800;
+}
+
+.badge-modern-blue {
+    @apply bg-blue-100 text-blue-800;
+}
+
+.badge-modern-purple {
+    @apply bg-purple-100 text-purple-800;
+}
+
+.badge-modern-orange {
+    @apply bg-orange-100 text-orange-800;
+}
+
+.badge-modern-success {
+    @apply bg-green-100 text-green-800;
+}
+
+.badge-modern-warning {
+    @apply bg-yellow-100 text-yellow-800;
+}
+
+.badge-modern-error {
+    @apply bg-red-100 text-red-800;
+}
+
+.badge-modern-info {
+    @apply bg-cyan-100 text-cyan-800;
+}
+
+/* Modern Alert Classes */
+.alert-modern {
+    @apply px-6 py-4 rounded-xl border font-medium flex items-start;
+}
+
+.alert-modern-success {
+    @apply bg-green-50 border-green-200 text-green-800;
+}
+
+.alert-modern-warning {
+    @apply bg-yellow-50 border-yellow-200 text-yellow-800;
+}
+
+.alert-modern-error {
+    @apply bg-red-50 border-red-200 text-red-800;
+}
+
+.alert-modern-info {
+    @apply bg-blue-50 border-blue-200 text-blue-800;
+}
+
+/* Hover Effects */
+.hover-lift-modern {
+    @apply transition-all duration-300 ease-out hover:-translate-y-1 hover:shadow-xl;
+}
+
+.hover-scale-modern {
+    @apply transition-all duration-300 ease-out hover:scale-105 hover:shadow-xl;
+}
+
+.hover-glow-modern {
+    @apply transition-all duration-300 ease-out hover:shadow-modern-lg hover:border-emerald-200;
+}
+
+/* Interactive Feedback */
+.interactive-press {
+    @apply transition-transform duration-150 active:scale-95;
+}
+
+.interactive-press-lg {
+    @apply transition-transform duration-150 active:scale-98;
+}
+
+/* Modern Gradients Backgrounds */
+.bg-gradient-modern-primary {
+    background: var(--gradient-modern-primary);
+}
+
+.bg-gradient-modern-secondary {
+    background: var(--gradient-modern-secondary);
+}
+
+.bg-gradient-modern-accent {
+    background: var(--gradient-modern-accent);
+}
+
+.bg-gradient-modern-emerald {
+    background: var(--gradient-modern-emerald);
+}
+
+.bg-gradient-modern-blue {
+    background: var(--gradient-modern-blue);
+}
+
+.bg-gradient-modern-purple {
+    background: var(--gradient-modern-purple);
+}
+
+.bg-gradient-modern-orange {
+    background: var(--gradient-modern-orange);
+}
+
+.bg-gradient-modern-slate {
+    background: var(--gradient-modern-slate);
+}
+
 
 
 
