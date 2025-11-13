@@ -3,6 +3,9 @@
          open: false,
          scrolled: false,
          init() {
+             // Set initial scroll state
+             this.scrolled = window.pageYOffset > 50;
+             // Add scroll listener
              window.addEventListener('scroll', () => {
                  this.scrolled = window.pageYOffset > 50;
              }, { passive: true });

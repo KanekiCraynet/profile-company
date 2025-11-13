@@ -1,4 +1,20 @@
-<div x-data="{ open: false, messages: [], isLoading: false }" 
+<div x-data="{
+         open: false,
+         messages: [],
+         isLoading: false,
+         init() {
+             // Initialize with welcome message when first opened
+             this.$watch('open', (value) => {
+                 if (value && this.messages.length === 0) {
+                     this.messages.push({
+                         type: 'bot',
+                         text: 'Halo! Saya di sini untuk membantu Anda dengan informasi tentang produk dan layanan kami. Ada yang bisa saya bantu?',
+                         time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                     });
+                 }
+             });
+         }
+     }"
      class="fixed bottom-6 right-6 z-50"
      id="chatbot-widget">
     
@@ -66,11 +82,19 @@
             <form @submit.prevent="
                 if ($refs.messageInput.value.trim()) {
                     const userMessage = $refs.messageInput.value.trim();
-                    messages.push({ type: 'user', text: userMessage, time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) });
+                    // Add user message
+                    messages.push({
+                        type: 'user',
+                        text: userMessage,
+                        time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                    });
                     $refs.messageInput.value = '';
                     $refs.messagesContainer.scrollTop = $refs.messagesContainer.scrollHeight;
+
+                    // Set loading state
                     isLoading = true;
-                    
+
+                    // Send message to backend
                     fetch('{{ route('chatbot.message') }}', {
                         method: 'POST',
                         headers: {
@@ -82,12 +106,21 @@
                     .then(response => response.json())
                     .then(data => {
                         isLoading = false;
-                        messages.push({ type: 'bot', text: data.response || data.message || 'Maaf, terjadi kesalahan. Silakan coba lagi.', time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) });
+                        messages.push({
+                            type: 'bot',
+                            text: data.response || data.message || 'Maaf, terjadi kesalahan. Silakan coba lagi.',
+                            time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                        });
+                        // Auto scroll to bottom after message is added
                         setTimeout(() => $refs.messagesContainer.scrollTop = $refs.messagesContainer.scrollHeight, 100);
                     })
                     .catch(error => {
                         isLoading = false;
-                        messages.push({ type: 'bot', text: 'Maaf, terjadi kesalahan. Silakan coba lagi.', time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) });
+                        messages.push({
+                            type: 'bot',
+                            text: 'Maaf, terjadi kesalahan. Silakan coba lagi.',
+                            time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                        });
                     });
                 }
             " class="flex space-x-2">
@@ -110,8 +143,8 @@
     </div>
 
     <!-- Chatbot Button -->
-    <button 
-        @click="open = !open; if (open && messages.length === 0) { messages.push({ type: 'bot', text: 'Halo! Saya di sini untuk membantu Anda dengan informasi tentang produk dan layanan kami. Ada yang bisa saya bantu?', time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) }); }"
+    <button
+        @click="open = !open"
         class="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-full w-16 h-16 md:w-20 md:h-20 flex items-center justify-center cursor-pointer shadow-2xl hover:shadow-primary-500/50 transform hover:scale-110 transition-all duration-300 pulse-ring"
         aria-label="Open chat">
         <svg x-show="!open" class="w-8 h-8 md:w-10 md:h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">

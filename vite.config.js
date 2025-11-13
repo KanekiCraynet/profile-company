@@ -23,8 +23,7 @@ export default defineConfig({
             output: {
                 // Manual chunk splitting for better caching
                 manualChunks: {
-                    // Vendor chunks
-                    'vendor-alpine': ['alpinejs'],
+                    // Vendor chunks - keep Alpine.js in main bundle to avoid timing issues
                     'vendor-axios': ['axios'],
                 },
                 // Optimize chunk file names
@@ -62,7 +61,9 @@ export default defineConfig({
     
     // Optimization
     optimizeDeps: {
-        include: ['alpinejs', 'axios'],
+        include: ['axios'],
+        // Keep Alpine.js in main bundle to avoid timing issues
+        exclude: ['alpinejs'],
     },
     
     // Server configuration
