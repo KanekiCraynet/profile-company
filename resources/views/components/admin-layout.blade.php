@@ -242,9 +242,6 @@
         </div>
     </div>
 
-    <!-- Alpine.js -->
-    <script src="//unpkg.com/alpinejs" defer></script>
-    
     <script>
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');

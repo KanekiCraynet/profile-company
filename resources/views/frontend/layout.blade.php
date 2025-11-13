@@ -7,14 +7,59 @@
 
     <title>{{ $title ?? config('app.name', 'PT Lestari Jaya Bangsa') }}</title>
 
-    <!-- SEO Meta Tags -->
+    <!-- Enhanced SEO Meta Tags -->
     <meta name="description" content="{{ $metaDescription ?? 'PT Lestari Jaya Bangsa provides high-quality herbal and processed food products, committed to prioritizing both health and taste.' }}">
-    <meta name="keywords" content="herbal products, food products, natural ingredients, BPOM certified, Halal MUI">
+    <meta name="keywords" content="herbal products, food products, natural ingredients, BPOM certified, Halal MUI, PT Lestari Jaya Bangsa, kesehatan, makanan herbal, produk alami">
+    <meta name="author" content="PT Lestari Jaya Bangsa">
+    <meta name="robots" content="index, follow">
+    <meta name="googlebot" content="index, follow">
+    <meta name="language" content="Indonesian">
+    <meta name="revisit-after" content="7 days">
+    <meta name="distribution" content="global">
+    <meta name="rating" content="general">
 
-    <!-- Open Graph -->
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
     <meta property="og:title" content="{{ $title ?? config('app.name', 'PT Lestari Jaya Bangsa') }}">
     <meta property="og:description" content="{{ $metaDescription ?? 'PT Lestari Jaya Bangsa provides high-quality herbal and processed food products.' }}">
-    <meta property="og:type" content="website">
+    <meta property="og:url" content="{{ url()->current() }}">
+    <meta property="og:site_name" content="PT Lestari Jaya Bangsa">
+    <meta property="og:locale" content="id_ID">
+    @if(isset($ogImage))
+        <meta property="og:image" content="{{ $ogImage }}">
+        <meta property="og:image:width" content="1200">
+        <meta property="og:image:height" content="630">
+        <meta property="og:image:type" content="image/jpeg">
+    @endif
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ $title ?? config('app.name', 'PT Lestari Jaya Bangsa') }}">
+    <meta name="twitter:description" content="{{ $metaDescription ?? 'PT Lestari Jaya Bangsa provides high-quality herbal and processed food products.' }}">
+    @if(isset($ogImage))
+        <meta name="twitter:image" content="{{ $ogImage }}">
+    @endif
+
+    <!-- Additional Meta Tags -->
+    <meta name="theme-color" content="#10b981">
+    <meta name="msapplication-TileColor" content="#10b981">
+    <meta name="application-name" content="PT Lestari Jaya Bangsa">
+    <meta name="apple-mobile-web-app-title" content="PT Lestari Jaya Bangsa">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-touch-fullscreen" content="yes">
+
+    <!-- Canonical URL -->
+    <link rel="canonical" href="{{ url()->current() }}">
+
+    <!-- DNS Prefetch for Performance -->
+    <link rel="dns-prefetch" href="//fonts.bunny.net">
+    <link rel="dns-prefetch" href="//www.googletagmanager.com">
+
+    <!-- Preconnect for Critical Resources -->
+    <link rel="preconnect" href="https://fonts.bunny.net" crossorigin>
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin>
 
     <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.bunny.net">
@@ -69,135 +114,77 @@
         {{ $slot }}
     </main>
 
-    <!-- Footer -->
-    <footer class="bg-gray-900 text-white">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
-                <div class="col-span-1 md:col-span-2">
-                    <h3 class="text-xl font-bold mb-4">PT Lestari Jaya Bangsa</h3>
-                    <p class="text-gray-300 mb-4">
-                        Food & Herbal — Health and Flavour, United in One Choice
-                    </p>
-                    <p class="text-gray-300 text-sm">
-                        Providing high-quality herbal and processed food products, committed to prioritizing both health and taste.
-                    </p>
-                </div>
+      <!-- Footer Component -->
+    <x-footer />
 
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Quick Links</h4>
-                    <ul class="space-y-2">
-                        <li><a href="{{ route('home') }}" class="text-gray-300 hover:text-white">Home</a></li>
-                        <li><a href="{{ route('products.index') }}" class="text-gray-300 hover:text-white">Products</a></li>
-                        <li><a href="{{ route('about') }}" class="text-gray-300 hover:text-white">About</a></li>
-                        <li><a href="{{ route('articles.index') }}" class="text-gray-300 hover:text-white">Articles</a></li>
-                        <li><a href="{{ route('contact') }}" class="text-gray-300 hover:text-white">Contact</a></li>
-                    </ul>
-                </div>
+    <!-- Chatbot Component -->
+    <x-chatbot />
 
-                <div>
-                    <h4 class="text-lg font-semibold mb-4">Contact Info</h4>
-                    <div class="space-y-2 text-gray-300 text-sm">
-                        <p>Jl. Raya Buntu - Sampang, Utara Pasar, Kali Minyak, Bangsa, Kec. Kebasen, Kabupaten Banyumas, Jawa Tengah 53282</p>
-                        <p>Working Hours: 07:00 - 16:00</p>
-                        <p>Phone: (+62) 821-9698-146</p>
-                    </div>
-                </div>
-            </div>
-
-            <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm">
-                <p>&copy; {{ date('Y') }} PT Lestari Jaya Bangsa. All rights reserved.</p>
-            </div>
-        </div>
-    </footer>
-
-    <!-- Chatbot Widget -->
-    <div id="chatbot-widget" class="fixed bottom-6 right-6 z-50">
-        <div id="chatbot-button" class="bg-green-600 hover:bg-green-700 text-white rounded-full w-16 h-16 flex items-center justify-center cursor-pointer shadow-lg transition-colors">
-            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path>
-            </svg>
-        </div>
-
-        <div id="chatbot-window" class="hidden bg-white rounded-lg shadow-xl w-80 h-96 flex flex-col overflow-hidden">
-            <div class="bg-green-600 text-white p-4">
-                <h3 class="font-semibold">PT Lestari Jaya Bangsa Support</h3>
-                <p class="text-sm opacity-90">How can we help you today?</p>
-            </div>
-
-            <div id="chat-messages" class="flex-1 p-4 overflow-y-auto space-y-3">
-                <div class="bg-gray-100 rounded-lg p-3 max-w-xs">
-                    <p class="text-sm">Hello! I'm here to help you with information about our products and services. What would you like to know?</p>
-                </div>
-            </div>
-
-            <div class="border-t p-4">
-                <div class="flex space-x-2">
-                    <input type="text" id="chat-input" placeholder="Type your message..." class="flex-1 border rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
-                    <button id="send-message" class="bg-green-600 text-white px-4 py-2 rounded-lg hover:bg-green-700">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"></path>
-                        </svg>
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Alpine.js and Chatbot Script -->
-    <script src="//unpkg.com/alpinejs" defer></script>
+  <!-- Optimized JavaScript for Alpine.js Compatibility -->
     <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const chatbotButton = document.getElementById('chatbot-button');
-            const chatbotWindow = document.getElementById('chatbot-window');
-            const chatInput = document.getElementById('chat-input');
-            const sendButton = document.getElementById('send-message');
-            const chatMessages = document.getElementById('chat-messages');
-
-            chatbotButton.addEventListener('click', function() {
-                chatbotWindow.classList.toggle('hidden');
-            });
-
-            function sendMessage() {
-                const message = chatInput.value.trim();
-                if (!message) return;
-
-                // Add user message
-                addMessage(message, 'user');
-                chatInput.value = '';
-
-                // Send to backend and get response
-                fetch('/api/chatbot', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content')
-                    },
-                    body: JSON.stringify({ message: message })
-                })
-                .then(response => response.json())
-                .then(data => {
-                    addMessage(data.response, 'bot');
-                })
-                .catch(error => {
-                    addMessage('Sorry, I encountered an error. Please try again.', 'bot');
-                });
-            }
-
-            sendButton.addEventListener('click', sendMessage);
-            chatInput.addEventListener('keypress', function(e) {
-                if (e.key === 'Enter') {
-                    sendMessage();
-                }
-            });
-
-            function addMessage(text, sender) {
-                const messageDiv = document.createElement('div');
-                messageDiv.className = sender === 'user' ? 'bg-green-100 rounded-lg p-3 max-w-xs ml-auto' : 'bg-gray-100 rounded-lg p-3 max-w-xs';
-                messageDiv.innerHTML = `<p class="text-sm">${text}</p>`;
-                chatMessages.appendChild(messageDiv);
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }
+        // Wait for Alpine.js to be ready
+        document.addEventListener('alpine:init', () => {
+            console.log('Alpine.js initialized');
         });
+
+        // Enhanced smooth scroll for anchor links
+        document.addEventListener('DOMContentLoaded', function() {
+            // Smooth scroll for anchor links
+            document.querySelectorAll('a[href^="#"]').forEach(function(anchor) {
+                anchor.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // Add loading states for forms
+            document.querySelectorAll('form').forEach(function(form) {
+                form.addEventListener('submit', function() {
+                    const submitBtn = form.querySelector('[type="submit"]');
+                    if (submitBtn) {
+                        submitBtn.disabled = true;
+                        submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+                        const originalText = submitBtn.textContent;
+                        submitBtn.innerHTML = `
+                            <span class="inline-flex items-center">
+                                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                                </svg>
+                                Memproses...
+                            </span>
+                        `;
+
+                        // Reset button after 10 seconds in case of error
+                        setTimeout(function() {
+                            submitBtn.disabled = false;
+                            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+                            submitBtn.textContent = originalText;
+                        }, 10000);
+                    }
+                });
+            });
+        });
+
+        // Error handling for debugging
+        window.addEventListener('error', function(e) {
+            console.error('JavaScript error:', e.error);
+        });
+
+        // Performance monitoring
+        if ('performance' in window) {
+            window.addEventListener('load', function() {
+                const perfData = window.performance.timing;
+                const pageLoadTime = perfData.loadEventEnd - perfData.navigationStart;
+                console.log('Page load time:', pageLoadTime + 'ms');
+            });
+        }
     </script>
 </body>
 </html>

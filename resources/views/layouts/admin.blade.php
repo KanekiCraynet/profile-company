@@ -172,7 +172,5 @@
         </div>
     </div>
 
-    <!-- Alpine.js -->
-    <script src="//unpkg.com/alpinejs" defer></script>
 </body>
 </html>

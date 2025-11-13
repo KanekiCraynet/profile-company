@@ -34,6 +34,16 @@ abstract class BaseRepository implements RepositoryInterface
     }
 
     /**
+     * Get a new query builder instance.
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
+    protected function newQuery()
+    {
+        return $this->model->newQuery();
+    }
+
+    /**
      * Get all records.
      *
      * @param array $columns
@@ -41,7 +51,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function all(array $columns = ['*']): Collection
     {
-        return $this->model->select($columns)->get();
+        return $this->newQuery()->select($columns)->get();
     }
 
     /**
@@ -53,7 +63,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function find(int $id, array $columns = ['*'])
     {
-        return $this->model->select($columns)->find($id);
+        return $this->newQuery()->select($columns)->find($id);
     }
 
     /**
@@ -66,7 +76,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function findOrFail(int $id, array $columns = ['*'])
     {
-        return $this->model->select($columns)->findOrFail($id);
+        return $this->newQuery()->select($columns)->findOrFail($id);
     }
 
     /**
@@ -79,7 +89,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function findBy(string $field, $value, array $columns = ['*'])
     {
-        return $this->model->select($columns)->where($field, $value)->first();
+        return $this->newQuery()->select($columns)->where($field, $value)->first();
     }
 
     /**
@@ -90,7 +100,7 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function create(array $data): Model
     {
-        return $this->model->create($data);
+        return $this->newQuery()->create($data);
     }
 
     /**
@@ -127,23 +137,27 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function paginate(int $perPage = 15, array $columns = ['*']): LengthAwarePaginator
     {
-        return $this->model->select($columns)->paginate($perPage);
+        return $this->newQuery()->select($columns)->paginate($perPage);
     }
 
     /**
      * Get records with relationships.
+     * Note: This is for fluent query building. Use newQuery() in repository methods instead.
      *
      * @param array|string $relations
      * @return \App\Repositories\RepositoryInterface
      */
     public function with($relations): RepositoryInterface
     {
-        $this->model = $this->model->with($relations);
+        // Note: This method is kept for interface compatibility
+        // All repository methods should use newQuery() directly for better isolation
+        // This method doesn't modify the base model instance
         return $this;
     }
 
     /**
      * Add a where clause.
+     * Note: This is for fluent query building. Use newQuery() in repository methods instead.
      *
      * @param string $column
      * @param mixed $operator
@@ -152,11 +166,9 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function where(string $column, $operator = null, $value = null): RepositoryInterface
     {
-        if (func_num_args() === 2) {
-            $value = $operator;
-            $operator = '=';
-        }
-        $this->model = $this->model->where($column, $operator, $value);
+        // Note: This method is kept for interface compatibility
+        // All repository methods should use newQuery() directly for better isolation
+        // This method doesn't modify the base model instance
         return $this;
     }
 
@@ -167,7 +179,59 @@ abstract class BaseRepository implements RepositoryInterface
      */
     public function count(): int
     {
-        return $this->model->count();
+        return $this->newQuery()->count();
+    }
+
+    /**
+     * Check if a record exists by field (optimized with EXISTS query).
+     *
+     * @param string $field
+     * @param mixed $value
+     * @param int|null $excludeId Exclude this ID from the check (useful for updates)
+     * @return bool
+     */
+    public function existsBy(string $field, $value, ?int $excludeId = null): bool
+    {
+        $query = $this->newQuery()->where($field, $value);
+        
+        if ($excludeId !== null) {
+            $query->where('id', '!=', $excludeId);
+        }
+        
+        return $query->exists();
+    }
+
+    /**
+     * Generate unique slug by checking existence efficiently.
+     *
+     * @param string $baseSlug
+     * @param int|null $excludeId Exclude this ID from the check (useful for updates)
+     * @param int $maxAttempts Maximum number of attempts to find a unique slug
+     * @return string
+     */
+    public function generateUniqueSlug(string $baseSlug, ?int $excludeId = null, int $maxAttempts = 100): string
+    {
+        $slug = $baseSlug;
+        $counter = 1;
+
+        // Check if base slug exists (uses newQuery, so doesn't affect model state)
+        if (!$this->existsBy('slug', $slug, $excludeId)) {
+            return $slug;
+        }
+
+        // Try with counter until we find a unique slug
+        while ($counter <= $maxAttempts) {
+            $slug = $baseSlug . '-' . $counter;
+            
+            if (!$this->existsBy('slug', $slug, $excludeId)) {
+                return $slug;
+            }
+            
+            $counter++;
+        }
+
+        // Fallback: use timestamp if we can't find a unique slug
+        return $baseSlug . '-' . time();
     }
 
     /**

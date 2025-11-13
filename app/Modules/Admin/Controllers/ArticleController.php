@@ -3,42 +3,29 @@
 namespace App\Modules\Admin\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreArticleRequest;
+use App\Http\Requests\UpdateArticleRequest;
 use App\Models\Article;
 use App\Models\ArticleCategory;
 use App\Models\ArticleTag;
+use App\Services\ArticleService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Str;
 
 class ArticleController extends Controller
 {
-    public function index()
+    public function __construct(
+        protected ArticleService $articleService
+    ) {}
+
+    public function index(Request $request)
     {
-        $query = Article::with('category', 'author');
+        $filters = [
+            'search' => $request->input('search'),
+            'status' => $request->input('status'),
+            'category' => $request->input('category'),
+        ];
 
-        // Apply search filter
-        if (request('search')) {
-            $search = request('search');
-            $query->where(function($q) use ($search) {
-                $q->where('title', 'like', '%' . $search . '%')
-                  ->orWhere('content', 'like', '%' . $search . '%');
-            });
-        }
-
-        // Apply status filter
-        if (request('status')) {
-            if (request('status') === 'published') {
-                $query->where('is_published', true);
-            } elseif (request('status') === 'draft') {
-                $query->where('is_published', false);
-            }
-        }
-
-        // Apply category filter
-        if (request('category')) {
-            $query->where('article_category_id', request('category'));
-        }
-
-        $articles = $query->paginate(15);
+        $articles = $this->articleService->getPaginated($filters, 15);
         $categories = ArticleCategory::orderBy('name')->get();
         
         return view('admin.articles.index', compact('articles', 'categories'));
@@ -51,48 +38,38 @@ class ArticleController extends Controller
         return view('admin.articles.create', compact('categories', 'tags'));
     }
 
-    public function store(Request $request)
+    public function store(StoreArticleRequest $request)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'excerpt' => 'nullable|string|max:500',
-            'content' => 'required|string',
-            'article_category_id' => 'required|exists:article_categories,id',
-            'tags' => 'nullable|array',
-            'tags.*' => 'exists:article_tags,id',
-            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'is_published' => 'boolean',
-            'published_at' => 'nullable|date',
-        ]);
+        try {
+            $data = $request->validated();
+            
+            // Normalize category_id field name
+            if (isset($data['category_id'])) {
+                $data['category_id'] = $data['category_id'];
+            } elseif (isset($data['article_category_id'])) {
+                $data['category_id'] = $data['article_category_id'];
+                unset($data['article_category_id']);
+            }
 
-        $article = Article::create([
-            'title' => $request->title,
-            'slug' => Str::slug($request->title),
-            'excerpt' => $request->excerpt,
-            'content' => $request->content,
-            'article_category_id' => $request->article_category_id,
-            'author_id' => auth()->id(),
-            'is_published' => $request->boolean('is_published'),
-            'published_at' => $request->published_at ?? ($request->boolean('is_published') ? now() : null),
-        ]);
+            $tags = $data['tags'] ?? null;
+            unset($data['tags']);
 
-        // Handle tags
-        if ($request->tags) {
-            $article->tags()->attach($request->tags);
+            $featuredImage = $request->hasFile('featured_image') ? $request->file('featured_image') : null;
+
+            $this->articleService->create($data, $tags, $featuredImage);
+
+            return redirect()->route('admin.articles.index')
+                ->with('success', 'Article created successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Failed to create article: ' . $e->getMessage());
         }
-
-        // Handle featured image
-        if ($request->hasFile('featured_image')) {
-            $filename = time() . '.' . $request->featured_image->extension();
-            $request->featured_image->move(public_path('uploads'), $filename);
-            $article->update(['featured_image' => $filename]);
-        }
-
-        return redirect()->route('admin.articles.index')->with('success', 'Article created successfully.');
     }
 
     public function show(Article $article)
     {
+        $article->load(['category', 'author', 'tags']);
         return view('admin.articles.show', compact('article'));
     }
 
@@ -100,59 +77,49 @@ class ArticleController extends Controller
     {
         $categories = ArticleCategory::all();
         $tags = ArticleTag::all();
+        $article->load('tags');
         return view('admin.articles.edit', compact('article', 'categories', 'tags'));
     }
 
-    public function update(Request $request, Article $article)
+    public function update(UpdateArticleRequest $request, Article $article)
     {
-        $request->validate([
-            'title' => 'required|string|max:255',
-            'excerpt' => 'nullable|string|max:500',
-            'content' => 'required|string',
-            'article_category_id' => 'required|exists:article_categories,id',
-            'tags' => 'nullable|array',
-            'tags.*' => 'exists:article_tags,id',
-            'featured_image' => 'nullable|image|mimes:jpeg,png,jpg,gif|max:2048',
-            'is_published' => 'boolean',
-            'published_at' => 'nullable|date',
-        ]);
-
-        $article->update([
-            'title' => $request->title,
-            'slug' => Str::slug($request->title),
-            'excerpt' => $request->excerpt,
-            'content' => $request->content,
-            'article_category_id' => $request->article_category_id,
-            'is_published' => $request->boolean('is_published'),
-            'published_at' => $request->published_at ?? ($request->boolean('is_published') ? now() : null),
-        ]);
-
-        // Handle tags
-        $article->tags()->sync($request->tags ?? []);
-
-        // Handle featured image
-        if ($request->hasFile('featured_image')) {
-            // Delete old image
-            if ($article->featured_image && file_exists(public_path('uploads/' . $article->featured_image))) {
-                unlink(public_path('uploads/' . $article->featured_image));
+        try {
+            $data = $request->validated();
+            
+            // Normalize category_id field name
+            if (isset($data['category_id'])) {
+                $data['category_id'] = $data['category_id'];
+            } elseif (isset($data['article_category_id'])) {
+                $data['category_id'] = $data['article_category_id'];
+                unset($data['article_category_id']);
             }
 
-            $filename = time() . '.' . $request->featured_image->extension();
-            $request->featured_image->move(public_path('uploads'), $filename);
-            $article->update(['featured_image' => $filename]);
-        }
+            $tags = $data['tags'] ?? null;
+            unset($data['tags']);
 
-        return redirect()->route('admin.articles.index')->with('success', 'Article updated successfully.');
+            $featuredImage = $request->hasFile('featured_image') ? $request->file('featured_image') : null;
+
+            $this->articleService->update($article->id, $data, $tags, $featuredImage);
+
+            return redirect()->route('admin.articles.index')
+                ->with('success', 'Article updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Failed to update article: ' . $e->getMessage());
+        }
     }
 
     public function destroy(Article $article)
     {
-        // Delete featured image
-        if ($article->featured_image && file_exists(public_path('uploads/' . $article->featured_image))) {
-            unlink(public_path('uploads/' . $article->featured_image));
-        }
+        try {
+            $this->articleService->delete($article->id, true);
 
-        $article->delete();
-        return redirect()->route('admin.articles.index')->with('success', 'Article deleted successfully.');
+            return redirect()->route('admin.articles.index')
+                ->with('success', 'Article deleted successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Failed to delete article: ' . $e->getMessage());
+        }
     }
 }

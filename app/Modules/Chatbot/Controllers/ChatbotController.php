@@ -3,17 +3,21 @@
 namespace App\Modules\Chatbot\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\ChatbotRule;
-use App\Models\ChatHistory;
+use App\Services\ChatbotService;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Http\JsonResponse;
+use Illuminate\Support\Facades\Log;
 
 class ChatbotController extends Controller
 {
+    public function __construct(
+        protected ChatbotService $chatbotService
+    ) {}
+
     /**
-     * Handle GET request to chatbot endpoint (returns error message)
+     * Handle GET request to chatbot endpoint (returns error message).
      */
-    public function handleGet()
+    public function handleGet(): JsonResponse
     {
         return response()->json([
             'error' => 'This endpoint only accepts POST requests. Please use the chatbot interface.',
@@ -22,72 +26,65 @@ class ChatbotController extends Controller
     }
 
     /**
-     * Handle POST request with chatbot message
+     * Handle POST request with chatbot message (optimized with service layer).
      */
-    public function handleMessage(Request $request)
+    public function handleMessage(Request $request): JsonResponse
     {
         $request->validate([
             'message' => 'required|string|max:500'
         ]);
 
-        $message = strtolower(trim($request->message));
-        $userId = auth()->id(); // Can be null for unauthenticated users
-
-        // Check for keyword matches in chatbot rules
-        $rules = Cache::remember('chatbot_rules', 3600, function () {
-            return ChatbotRule::where('status', 'active')
-                ->orderBy('priority', 'desc')
-                ->get();
-        });
-
-        $response = null;
-        $matchedRule = null;
-
-        foreach ($rules as $rule) {
-            // Check if the keyword appears in the message
-            $keyword = strtolower(trim($rule->keyword));
-            if (!empty($keyword) && str_contains($message, $keyword)) {
-                $response = $rule->response;
-                $matchedRule = $rule;
-                break;
-            }
-        }
-
-        // Fallback responses if no keyword match
-        if (!$response) {
-            $fallbacks = [
-                'I\'m sorry, I didn\'t understand that. Could you please rephrase your question?',
-                'I\'m here to help with information about our products and services. What would you like to know?',
-                'Please check our website for more detailed information, or feel free to ask about our products!',
-            ];
-            $response = $fallbacks[array_rand($fallbacks)];
-        }
-
-        // Save chat history
         try {
-            $sessionId = session()->getId() ?? null;
+            // Get session ID from session or request
+            $sessionId = session()->getId() ?? $request->input('session_id');
             
-            ChatHistory::create([
-                'session_id' => $sessionId,
-                'user_id' => $userId,
-                'user_message' => $request->message,
-                'bot_response' => $response,
-                'rule_id' => $matchedRule ? $matchedRule->id : null,
-                'ip_address' => $request->ip(),
-                'user_agent' => $request->userAgent() ?? 'Unknown',
-            ]);
-        } catch (\Exception $e) {
-            // Log the error but don't fail the request
-            \Log::error('Failed to save chat history: ' . $e->getMessage(), [
-                'exception' => $e,
-                'user_id' => $userId,
-                'message' => $request->message
-            ]);
-        }
+            // Get user ID (can be null for unauthenticated users)
+            $userId = auth()->id();
+            
+            // Get IP address and user agent
+            $ipAddress = $request->ip();
+            $userAgent = $request->userAgent() ?? 'Unknown';
 
-        return response()->json([
-            'response' => $response,
-            'timestamp' => now()->toISOString()
-        ]);
+            // Process message using service (handles rate limiting, caching, and rule matching)
+            $result = $this->chatbotService->processMessage(
+                $request->input('message'),
+                $sessionId,
+                $ipAddress,
+                $userAgent,
+                $userId
+            );
+
+            // Check if rate limit was exceeded
+            if (isset($result['error']) && $result['error'] === 'rate_limit_exceeded') {
+                return response()->json([
+                    'error' => 'rate_limit_exceeded',
+                    'message' => $result['response'],
+                    'rate_limit' => $result['rate_limit'] ?? null,
+                    'retry_after' => $result['rate_limit']['retry_after_minute'] ?? 60,
+                ], 429);
+            }
+
+            // Return successful response
+            return response()->json([
+                'response' => $result['response'],
+                'session_id' => $result['session_id'],
+                'timestamp' => $result['timestamp'] ?? now()->toISOString(),
+            ]);
+
+        } catch (\Exception $e) {
+            // Log the error
+            Log::error('Chatbot error: ' . $e->getMessage(), [
+                'exception' => $e,
+                'message' => $request->input('message'),
+                'ip' => $request->ip(),
+            ]);
+
+            // Return error response
+            return response()->json([
+                'error' => 'An error occurred while processing your message.',
+                'response' => 'I apologize, but I encountered an error. Please try again later.',
+                'timestamp' => now()->toISOString(),
+            ], 500);
+        }
     }
 }

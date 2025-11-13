@@ -21,7 +21,7 @@ class ProductRepository extends BaseRepository
      */
     public function getActiveProducts()
     {
-        return $this->model->where('is_active', true)->get();
+        return $this->newQuery()->where('is_active', true)->get();
     }
 
     /**
@@ -32,7 +32,7 @@ class ProductRepository extends BaseRepository
      */
     public function getFeaturedProducts(int $limit = 6)
     {
-        return $this->model
+        return $this->newQuery()
             ->where('is_active', true)
             ->where('is_featured', true)
             ->limit($limit)
@@ -47,7 +47,10 @@ class ProductRepository extends BaseRepository
      */
     public function findBySlug(string $slug)
     {
-        return $this->model->where('slug', $slug)->where('is_active', true)->first();
+        return $this->newQuery()
+            ->where('slug', $slug)
+            ->where('is_active', true)
+            ->first();
     }
 
     /**
@@ -58,7 +61,7 @@ class ProductRepository extends BaseRepository
      */
     public function getByCategory(int $categoryId)
     {
-        return $this->model
+        return $this->newQuery()
             ->where('product_category_id', $categoryId)
             ->where('is_active', true)
             ->get();
@@ -74,7 +77,7 @@ class ProductRepository extends BaseRepository
      */
     public function getRelatedProducts(int $productId, int $categoryId, int $limit = 4)
     {
-        return $this->model
+        return $this->newQuery()
             ->where('product_category_id', $categoryId)
             ->where('id', '!=', $productId)
             ->where('is_active', true)

@@ -4,6 +4,9 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Gate;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use App\Repositories\RepositoryInterface;
 use App\Repositories\ProductRepository;
 use App\Repositories\ArticleRepository;
@@ -32,6 +35,53 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        // Enable query logging in development mode
+        if (config('app.debug') && config('app.env') !== 'production') {
+            DB::listen(function ($query) {
+                $sql = $query->sql;
+                $bindings = $query->bindings;
+                $time = $query->time;
+
+                // Log slow queries (more than 100ms)
+                if ($time > 100) {
+                    Log::warning('Slow query detected', [
+                        'sql' => $sql,
+                        'bindings' => $bindings,
+                        'time' => $time . 'ms',
+                    ]);
+                }
+
+                // Log all queries in debug mode (only if APP_LOG_QUERIES is true)
+                if (config('app.log_queries', false)) {
+                    Log::debug('Query executed', [
+                        'sql' => $sql,
+                        'bindings' => $bindings,
+                        'time' => $time . 'ms',
+                    ]);
+                }
+            });
+        }
+
+        // Performance monitoring: Log slow requests (development only)
+        if (config('app.debug') && config('app.env') !== 'production') {
+            // Register a listener for request timing
+            app()->terminating(function () {
+                // Check if LARAVEL_START is defined (usually defined in public/index.php)
+                if (defined('LARAVEL_START')) {
+                    $executionTime = microtime(true) - LARAVEL_START;
+                    
+                    // Log slow requests (more than 1 second)
+                    if ($executionTime > 1.0) {
+                        Log::warning('Slow request detected', [
+                            'execution_time' => round($executionTime * 1000, 2) . 'ms',
+                            'memory_usage' => round(memory_get_usage(true) / 1024 / 1024, 2) . 'MB',
+                            'peak_memory' => round(memory_get_peak_usage(true) / 1024 / 1024, 2) . 'MB',
+                        ]);
+                    }
+                }
+            });
+        }
+
         // Define Gates for authorization
         // Since role-based access is already handled by middleware,
         // these Gates check if the user has the appropriate roles

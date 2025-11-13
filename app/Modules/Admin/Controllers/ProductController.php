@@ -7,18 +7,30 @@ use App\Http\Requests\StoreProductRequest;
 use App\Http\Requests\UpdateProductRequest;
 use App\Models\Product;
 use App\Models\ProductCategory;
-use Illuminate\Support\Str;
+use App\Services\ProductService;
+use Illuminate\Http\Request;
 
 class ProductController extends Controller
 {
+    public function __construct(
+        protected ProductService $productService
+    ) {}
+
     /**
      * Display a listing of products.
      */
-    public function index()
+    public function index(Request $request)
     {
         $this->authorize('view products');
 
-        $products = Product::with('category')->paginate(15);
+        $filters = [
+            'search' => $request->input('search'),
+            'status' => $request->input('status'),
+            'category' => $request->input('category'),
+            'featured' => $request->input('featured'),
+        ];
+
+        $products = $this->productService->getPaginated($filters, 15);
         return view('admin.products.index', compact('products'));
     }
 
@@ -38,33 +50,29 @@ class ProductController extends Controller
      */
     public function store(StoreProductRequest $request)
     {
-        $validated = $request->validated();
+        try {
+            $data = $request->validated();
+            
+            // Convert boolean fields
+            $data['is_halal_certified'] = $request->boolean('is_halal_certified');
+            $data['is_bpom_certified'] = $request->boolean('is_bpom_certified');
+            $data['is_natural'] = $request->boolean('is_natural');
+            $data['is_featured'] = $request->boolean('is_featured');
+            $data['is_active'] = $request->boolean('is_active', true);
+            $data['stock_quantity'] = $data['stock_quantity'] ?? 0;
 
-        $product = Product::create([
-            'name' => $validated['name'],
-            'slug' => Str::slug($validated['name']),
-            'description' => $validated['description'],
-            'benefits' => $validated['benefits'] ?? null,
-            'usage_instructions' => $validated['usage_instructions'] ?? null,
-            'product_category_id' => $validated['product_category_id'],
-            'price' => $validated['price'] ?? null,
-            'stock_quantity' => $validated['stock_quantity'] ?? 0,
-            'is_halal_certified' => $request->boolean('is_halal_certified'),
-            'is_bpom_certified' => $request->boolean('is_bpom_certified'),
-            'is_natural' => $request->boolean('is_natural'),
-            'is_featured' => $request->boolean('is_featured'),
-            'is_active' => $request->boolean('is_active', true),
-        ]);
+            // Get images
+            $images = $request->hasFile('images') ? $request->file('images') : null;
 
-        // Handle image uploads
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                $product->addMedia($image)->toMediaCollection('images');
-            }
+            $this->productService->create($data, $images);
+
+            return redirect()->route('admin.products.index')
+                ->with('success', 'Product created successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Failed to create product: ' . $e->getMessage());
         }
-
-        return redirect()->route('admin.products.index')
-            ->with('success', 'Product created successfully.');
     }
 
     /**
@@ -74,7 +82,7 @@ class ProductController extends Controller
     {
         $this->authorize('view products');
 
-        $product->load('category', 'media');
+        $product->load(['category', 'media']);
         return view('admin.products.show', compact('product'));
     }
 
@@ -95,33 +103,29 @@ class ProductController extends Controller
      */
     public function update(UpdateProductRequest $request, Product $product)
     {
-        $validated = $request->validated();
+        try {
+            $data = $request->validated();
+            
+            // Convert boolean fields
+            $data['is_halal_certified'] = $request->boolean('is_halal_certified');
+            $data['is_bpom_certified'] = $request->boolean('is_bpom_certified');
+            $data['is_natural'] = $request->boolean('is_natural');
+            $data['is_featured'] = $request->boolean('is_featured');
+            $data['is_active'] = $request->boolean('is_active', true);
+            $data['stock_quantity'] = $data['stock_quantity'] ?? 0;
 
-        $product->update([
-            'name' => $validated['name'],
-            'slug' => Str::slug($validated['name']),
-            'description' => $validated['description'],
-            'benefits' => $validated['benefits'] ?? null,
-            'usage_instructions' => $validated['usage_instructions'] ?? null,
-            'product_category_id' => $validated['product_category_id'],
-            'price' => $validated['price'] ?? null,
-            'stock_quantity' => $validated['stock_quantity'] ?? 0,
-            'is_halal_certified' => $request->boolean('is_halal_certified'),
-            'is_bpom_certified' => $request->boolean('is_bpom_certified'),
-            'is_natural' => $request->boolean('is_natural'),
-            'is_featured' => $request->boolean('is_featured'),
-            'is_active' => $request->boolean('is_active', true),
-        ]);
+            // Get images
+            $images = $request->hasFile('images') ? $request->file('images') : null;
 
-        // Handle image uploads
-        if ($request->hasFile('images')) {
-            foreach ($request->file('images') as $image) {
-                $product->addMedia($image)->toMediaCollection('images');
-            }
+            $this->productService->update($product->id, $data, $images);
+
+            return redirect()->route('admin.products.index')
+                ->with('success', 'Product updated successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->withInput()
+                ->with('error', 'Failed to update product: ' . $e->getMessage());
         }
-
-        return redirect()->route('admin.products.index')
-            ->with('success', 'Product updated successfully.');
     }
 
     /**
@@ -131,13 +135,15 @@ class ProductController extends Controller
     {
         $this->authorize('delete products');
 
-        // Delete associated media
-        $product->clearMediaCollection('images');
+        try {
+            $this->productService->delete($product->id);
 
-        $product->delete();
-
-        return redirect()->route('admin.products.index')
-            ->with('success', 'Product deleted successfully.');
+            return redirect()->route('admin.products.index')
+                ->with('success', 'Product deleted successfully.');
+        } catch (\Exception $e) {
+            return redirect()->back()
+                ->with('error', 'Failed to delete product: ' . $e->getMessage());
+        }
     }
 
     /**
@@ -147,14 +153,16 @@ class ProductController extends Controller
     {
         $this->authorize('edit products');
 
-        $media = $product->getMedia('images')->find($mediaId);
-        
-        if (!$media) {
+        try {
+            $success = $this->productService->removeImage($product->id, $mediaId);
+            
+            if ($success) {
+                return back()->with('success', 'Image removed successfully.');
+            }
+
             return back()->with('error', 'Image not found.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to remove image: ' . $e->getMessage());
         }
-
-        $media->delete();
-
-        return back()->with('success', 'Image removed successfully.');
     }
 }
