@@ -10,6 +10,20 @@ use Illuminate\Support\Facades\Cache;
 
 class ChatbotController extends Controller
 {
+    /**
+     * Handle GET request to chatbot endpoint (returns error message)
+     */
+    public function handleGet()
+    {
+        return response()->json([
+            'error' => 'This endpoint only accepts POST requests. Please use the chatbot interface.',
+            'message' => 'Use POST method with a JSON body containing {"message": "your message"}'
+        ], 405);
+    }
+
+    /**
+     * Handle POST request with chatbot message
+     */
     public function handleMessage(Request $request)
     {
         $request->validate([

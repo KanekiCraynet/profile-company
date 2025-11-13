@@ -18,6 +18,7 @@ return new class extends Migration
             $table->string('type')->default('string'); // string, text, json, file
             $table->string('group')->default('general'); // general, seo, email, social
             $table->timestamps();
+            $table->softDeletes();
         });
     }
 

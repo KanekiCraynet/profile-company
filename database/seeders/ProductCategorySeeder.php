@@ -18,25 +18,25 @@ class ProductCategorySeeder extends Seeder
                 'name' => 'Herbal Teas',
                 'slug' => 'herbal-teas',
                 'description' => 'Traditional herbal tea blends for health and wellness',
-                'status' => 'active',
+                'is_active' => true,
             ],
             [
                 'name' => 'Spices & Seasonings',
                 'slug' => 'spices-seasonings',
                 'description' => 'Natural spices and seasonings for cooking',
-                'status' => 'active',
+                'is_active' => true,
             ],
             [
                 'name' => 'Health Supplements',
                 'slug' => 'health-supplements',
                 'description' => 'Natural health supplements and vitamins',
-                'status' => 'active',
+                'is_active' => true,
             ],
             [
                 'name' => 'Essential Oils',
                 'slug' => 'essential-oils',
                 'description' => 'Pure essential oils for aromatherapy and wellness',
-                'status' => 'active',
+                'is_active' => true,
             ],
         ];
 

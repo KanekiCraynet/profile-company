@@ -21,7 +21,7 @@ class Article extends Model
         'meta_description',
         'tags',
         'featured',
-        'status',
+        'is_published',
         'published_at',
         'author_id',
     ];
@@ -29,6 +29,7 @@ class Article extends Model
     protected $casts = [
         'tags' => 'array',
         'featured' => 'boolean',
+        'is_published' => 'boolean',
         'published_at' => 'datetime',
     ];
 

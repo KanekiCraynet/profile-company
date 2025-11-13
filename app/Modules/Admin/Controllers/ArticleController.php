@@ -19,7 +19,7 @@ class ArticleController extends Controller
 
     public function create()
     {
-        $categories = ArticleCategory::where('is_active', true)->get();
+        $categories = ArticleCategory::all();
         $tags = ArticleTag::all();
         return view('admin.articles.create', compact('categories', 'tags'));
     }
@@ -71,7 +71,7 @@ class ArticleController extends Controller
 
     public function edit(Article $article)
     {
-        $categories = ArticleCategory::where('is_active', true)->get();
+        $categories = ArticleCategory::all();
         $tags = ArticleTag::all();
         return view('admin.articles.edit', compact('article', 'categories', 'tags'));
     }

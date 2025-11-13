@@ -24,43 +24,46 @@ class ProductSeeder extends Seeder
                 'slug' => 'premium-ginger-tea-blend',
                 'description' => 'A soothing blend of premium ginger root with natural herbs. Perfect for digestion and immune support.',
                 'benefits' => 'Supports digestion, boosts immunity, natural anti-inflammatory properties.',
-                'certifications' => ['halal_mui', 'bpom', 'natural'],
-                'category_id' => $herbalTeasCategory?->id,
+                'is_halal_certified' => true,
+                'is_bpom_certified' => true,
+                'is_natural' => true,
+                'product_category_id' => $herbalTeasCategory?->id,
                 'price' => 45000,
-                'status' => 'active',
-                'featured' => true,
+                'is_active' => true,
+                'is_featured' => true,
             ],
             [
                 'name' => 'Organic Turmeric Powder',
                 'slug' => 'organic-turmeric-powder',
                 'description' => 'Pure organic turmeric powder, rich in curcumin. Sourced from the finest organic farms.',
                 'benefits' => 'Powerful antioxidant, supports joint health, anti-inflammatory properties.',
-                'certifications' => ['halal_mui', 'bpom', 'natural'],
-                'category_id' => $spicesCategory?->id,
+                'is_halal_certified' => true,
+                'is_bpom_certified' => true,
+                'is_natural' => true,
+                'product_category_id' => $spicesCategory?->id,
                 'price' => 35000,
-                'status' => 'active',
-                'featured' => true,
+                'is_active' => true,
+                'is_featured' => true,
             ],
             [
                 'name' => 'Natural Honey Blend',
                 'slug' => 'natural-honey-blend',
                 'description' => 'Pure natural honey blended with royal jelly. Rich in vitamins and minerals.',
                 'benefits' => 'Boosts energy, supports immune system, natural sweetener.',
-                'certifications' => ['halal_mui', 'bpom', 'natural'],
-                'category_id' => $supplementsCategory?->id,
+                'is_halal_certified' => true,
+                'is_bpom_certified' => true,
+                'is_natural' => true,
+                'product_category_id' => $supplementsCategory?->id,
                 'price' => 55000,
-                'status' => 'active',
-                'featured' => false,
+                'is_active' => true,
+                'is_featured' => false,
             ],
         ];
 
         foreach ($products as $product) {
-            $productData = $product;
-            $productData['certifications'] = json_encode($product['certifications']);
-
             Product::firstOrCreate(
-                ['slug' => $productData['slug']],
-                $productData
+                ['slug' => $product['slug']],
+                $product
             );
         }
     }

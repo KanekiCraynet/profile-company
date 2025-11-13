@@ -45,7 +45,7 @@
                 </div>
                 <div class="ml-4">
                     <h3 class="text-lg font-semibold text-gray-900">New Contacts</h3>
-                    <p class="text-2xl font-bold text-yellow-600">{{ \App\Models\Contact::where('status', 'pending')->count() }}</p>
+                    <p class="text-2xl font-bold text-yellow-600">{{ \App\Models\Contact::where('status', 'unread')->count() }}</p>
                 </div>
             </div>
         </div>
@@ -131,8 +131,8 @@
                                 <p class="text-xs text-gray-500">{{ $article->created_at->diffForHumans() }}</p>
                             </div>
                             <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
-                                {{ $article->is_published ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
-                                {{ $article->is_published ? 'Published' : 'Draft' }}
+                                {{ $article->status === 'published' ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800' }}">
+                                {{ ucfirst($article->status) }}
                             </span>
                         </div>
                         @endforeach

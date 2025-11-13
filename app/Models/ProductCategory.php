@@ -14,11 +14,15 @@ class ProductCategory extends Model
         'name',
         'slug',
         'description',
-        'status',
+        'is_active',
+    ];
+
+    protected $casts = [
+        'is_active' => 'boolean',
     ];
 
     public function products()
     {
-        return $this->hasMany(Product::class, 'category_id');
+        return $this->hasMany(Product::class, 'product_category_id');
     }
 }

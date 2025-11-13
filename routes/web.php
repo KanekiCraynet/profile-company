@@ -19,6 +19,9 @@ Route::get('/about', [PagesController::class, 'about'])->name('about');
 Route::get('/contact', [PagesController::class, 'contact'])->name('contact');
 Route::post('/contact', [PagesController::class, 'storeContact'])->name('contact.store');
 
+// Chatbot API route (public)
+Route::post('/chatbot/message', [\App\Modules\Chatbot\Controllers\ChatbotController::class, 'handleMessage'])->name('chatbot.message');
+
 // Authentication Routes
 Route::middleware('guest')->group(function () {
     Route::get('/login', [LoginController::class, 'showLoginForm'])->name('login');
