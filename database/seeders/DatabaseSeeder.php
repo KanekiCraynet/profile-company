@@ -16,13 +16,8 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call(RolePermissionSeeder::class);
-        $this->call(ChatbotRuleSeeder::class);
-        $this->call(ProductCategorySeeder::class);
-        $this->call(ArticleCategorySeeder::class);
-        $this->call(ProductSeeder::class);
-        $this->call(ArticleSeeder::class);
 
-        // Create Super Admin user
+        // Create Super Admin user first
         $superAdmin = User::firstOrCreate([
             'email' => 'superadmin@ljs.com'
         ], [
@@ -32,5 +27,11 @@ class DatabaseSeeder extends Seeder
         ]);
 
         $superAdmin->assignRole('Super Admin');
+
+        $this->call(ChatbotRuleSeeder::class);
+        $this->call(ProductCategorySeeder::class);
+        $this->call(ArticleCategorySeeder::class);
+        $this->call(ProductSeeder::class);
+        $this->call(ArticleSeeder::class);
     }
 }

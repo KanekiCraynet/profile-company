@@ -1,6 +1,7 @@
 <x-frontend-layout>
     <x-slot name="title">Products - PT Lestari Jaya Bangsa</x-slot>
     <x-slot name="metaDescription">Explore our range of high-quality herbal and processed food products. All products are BPOM certified and Halal MUI approved.</x-slot>
+    <x-slot name="metaKeywords">herbal products, food products, natural ingredients, BPOM certified, Halal MUI, PT Lestari Jaya Bangsa</x-slot>
 
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <!-- Header -->
@@ -13,8 +14,8 @@
         </div>
 
         <!-- Filters and Search -->
-        <div class="bg-white rounded-lg shadow-sm p-6 mb-8">
-            <form method="GET" action="{{ route('products.index') }}" class="flex flex-col md:flex-row gap-4">
+        <div class="bg-white rounded-lg shadow-sm p-4 sm:p-6 mb-8">
+            <form method="GET" action="{{ route('products.index') }}" class="flex flex-col sm:flex-row gap-4">
                 <!-- Search -->
                 <div class="flex-1">
                     <input type="text" name="search" value="{{ request('search') }}"
@@ -23,7 +24,7 @@
                 </div>
 
                 <!-- Category Filter -->
-                <div class="md:w-48">
+                <div class="w-full sm:w-48">
                     <select name="category" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                         <option value="">All Categories</option>
                         @foreach($categories as $category)
@@ -35,7 +36,7 @@
                 </div>
 
                 <!-- Sort -->
-                <div class="md:w-48">
+                <div class="w-full sm:w-48">
                     <select name="sort" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent">
                         <option value="name" {{ request('sort', 'name') == 'name' ? 'selected' : '' }}>Name A-Z</option>
                         <option value="price" {{ request('sort') == 'price' ? 'selected' : '' }}>Price</option>
@@ -43,26 +44,28 @@
                     </select>
                 </div>
 
-                <button type="submit" class="bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors">
-                    Filter
-                </button>
+                <div class="flex gap-2">
+                    <button type="submit" class="flex-1 sm:flex-none bg-green-600 text-white px-6 py-2 rounded-lg hover:bg-green-700 transition-colors font-medium">
+                        Filter
+                    </button>
 
-                @if(request()->hasAny(['search', 'category', 'sort']))
-                    <a href="{{ route('products.index') }}" class="bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors">
-                        Clear
-                    </a>
-                @endif
+                    @if(request()->hasAny(['search', 'category', 'sort']))
+                        <a href="{{ route('products.index') }}" class="flex-1 sm:flex-none bg-gray-500 text-white px-6 py-2 rounded-lg hover:bg-gray-600 transition-colors font-medium text-center">
+                            Clear
+                        </a>
+                    @endif
+                </div>
             </form>
         </div>
 
         <!-- Products Grid -->
         @if($products->count() > 0)
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 mb-8">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-6 mb-8">
                 @foreach($products as $product)
                 <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                     <div class="aspect-w-1 aspect-h-1 bg-gray-200">
-                        @if($product->getFirstMediaUrl('products'))
-                            <img src="{{ $product->getFirstMediaUrl('products') }}" alt="{{ $product->name }}" class="w-full h-48 object-cover">
+                        @if($product->getFirstMediaUrl('images'))
+                            <img src="{{ $product->getFirstMediaUrl('images') }}" alt="{{ $product->name }}" class="w-full h-48 object-cover" loading="lazy">
                         @else
                             <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
                                 <span class="text-gray-400">No Image</span>
@@ -87,7 +90,11 @@
                         </div>
 
                         <div class="flex justify-between items-center">
-                            <span class="text-green-600 font-semibold text-lg">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
+                            @if($product->price)
+                                <span class="text-green-600 font-semibold text-lg">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
+                            @else
+                                <span class="text-gray-500 text-sm">Contact for price</span>
+                            @endif
                             <a href="{{ route('products.show', $product->slug) }}" class="bg-green-600 text-white px-4 py-2 rounded-md text-sm hover:bg-green-700 transition-colors">
                                 View Details
                             </a>

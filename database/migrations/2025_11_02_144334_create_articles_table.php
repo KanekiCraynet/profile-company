@@ -28,6 +28,11 @@ return new class extends Migration
             $table->foreignId('author_id')->constrained('users')->onDelete('cascade');
             $table->softDeletes();
             $table->timestamps();
+
+            $table->index('category_id');
+            $table->index('status');
+            $table->index('featured');
+            $table->index('published_at');
         });
     }
 

@@ -75,8 +75,8 @@
                 @foreach($featuredProducts as $product)
                 <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow">
                     <div class="aspect-w-16 aspect-h-9 bg-gray-200">
-                        @if($product->getFirstMediaUrl('products'))
-                            <img src="{{ $product->getFirstMediaUrl('products') }}" alt="{{ $product->name }}" class="w-full h-48 object-cover">
+                        @if($product->getFirstMediaUrl('images'))
+                            <img src="{{ $product->getFirstMediaUrl('images') }}" alt="{{ $product->name }}" class="w-full h-48 object-cover">
                         @else
                             <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
                                 <span class="text-gray-400">No Image</span>
@@ -85,7 +85,7 @@
                     </div>
                     <div class="p-6">
                         <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ $product->name }}</h3>
-                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ $product->description }}</p>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-2">{{ \Illuminate\Support\Str::limit(strip_tags($product->description), 100) }}</p>
                         <div class="flex justify-between items-center">
                             <span class="text-green-600 font-semibold">Rp {{ number_format($product->price, 0, ',', '.') }}</span>
                             <a href="{{ route('products.show', $product->slug) }}" class="bg-green-600 text-white px-4 py-2 rounded-md text-sm hover:bg-green-700">
@@ -121,18 +121,18 @@
                 @foreach($latestArticles as $article)
                 <article class="bg-gray-50 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
                     @if($article->featured_image)
-                        <img src="{{ asset('uploads/' . $article->featured_image) }}" alt="{{ $article->title }}" class="w-full h-48 object-cover">
+                        <img src="{{ asset('storage/' . $article->featured_image) }}" alt="{{ $article->title }}" class="w-full h-48 object-cover" loading="lazy">
                     @else
-                        <div class="w-full h-48 bg-gray-200 flex items-center justify-center">
-                            <span class="text-gray-400">No Image</span>
+                        <div class="w-full h-48 bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
+                            <span class="text-green-400 text-4xl">📰</span>
                         </div>
                     @endif
                     <div class="p-6">
                         <div class="text-sm text-green-600 mb-2">{{ $article->category->name ?? 'Uncategorized' }}</div>
                         <h3 class="text-xl font-semibold text-gray-900 mb-2">{{ $article->title }}</h3>
-                        <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ $article->excerpt ?? Str::limit(strip_tags($article->content), 120) }}</p>
+                        <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ $article->excerpt ?? \Illuminate\Support\Str::limit(strip_tags($article->content), 120) }}</p>
                         <div class="flex justify-between items-center text-sm text-gray-500">
-                            <span>{{ $article->published_at->format('M d, Y') }}</span>
+                            <span>{{ $article->published_at?->format('M d, Y') ?? 'Not published' }}</span>
                             <a href="{{ route('articles.show', $article->slug) }}" class="text-green-600 hover:text-green-700 font-medium">
                                 Read More →
                             </a>

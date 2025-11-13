@@ -17,13 +17,21 @@ return new class extends Migration
             $table->string('slug')->unique();
             $table->text('description');
             $table->text('benefits')->nullable();
-            $table->json('certifications')->nullable(); // For Halal MUI, BPOM
-            $table->foreignId('category_id')->constrained('product_categories')->onDelete('cascade');
+            $table->text('usage_instructions')->nullable();
+            $table->boolean('is_halal_certified')->default(false);
+            $table->boolean('is_bpom_certified')->default(false);
+            $table->boolean('is_natural')->default(false);
+            $table->foreignId('product_category_id')->constrained('product_categories')->onDelete('cascade');
             $table->decimal('price', 10, 2)->nullable();
-            $table->string('status')->default('active');
-            $table->boolean('featured')->default(false);
+            $table->integer('stock_quantity')->nullable();
+            $table->boolean('is_active')->default(true);
+            $table->boolean('is_featured')->default(false);
             $table->softDeletes();
             $table->timestamps();
+
+            $table->index('product_category_id');
+            $table->index('is_active');
+            $table->index('is_featured');
         });
     }
 
