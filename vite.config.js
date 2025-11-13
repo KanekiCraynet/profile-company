@@ -61,9 +61,7 @@ export default defineConfig({
     
     // Optimization
     optimizeDeps: {
-        include: ['axios'],
-        // Keep Alpine.js in main bundle to avoid timing issues
-        exclude: ['alpinejs'],
+        include: ['axios', 'alpinejs'],
     },
     
     // Server configuration

@@ -155,7 +155,7 @@ class ProductController extends Controller
 
         try {
             $success = $this->productService->removeImage($product->id, $mediaId);
-            
+
             if ($success) {
                 return back()->with('success', 'Image removed successfully.');
             }
@@ -163,6 +163,58 @@ class ProductController extends Controller
             return back()->with('error', 'Image not found.');
         } catch (\Exception $e) {
             return back()->with('error', 'Failed to remove image: ' . $e->getMessage());
+        }
+    }
+
+    /**
+     * Export products to CSV or PDF.
+     */
+    public function export(Request $request)
+    {
+        $this->authorize('view products');
+
+        try {
+            $format = $request->get('format', 'csv');
+            $productIds = $request->get('ids', []);
+
+            $products = Product::with(['category'])
+                ->when(!empty($productIds), function ($query) use ($productIds) {
+                    $query->whereIn('id', $productIds);
+                })
+                ->orderBy('created_at', 'desc')
+                ->get();
+
+            if ($format === 'csv') {
+                $filename = 'products_' . date('Y-m-d_His') . '.csv';
+                $headers = [
+                    'Content-Type' => 'text/csv',
+                    'Content-Disposition' => 'attachment; filename="' . $filename . '"',
+                ];
+
+                $callback = function () use ($products) {
+                    $file = fopen('php://output', 'w');
+                    fputcsv($file, ['Name', 'Category', 'Price', 'Stock', 'Status', 'Created At']);
+
+                    foreach ($products as $product) {
+                        fputcsv($file, [
+                            $product->name,
+                            $product->category->name ?? 'No Category',
+                            $product->price,
+                            $product->stock_quantity,
+                            $product->is_active ? 'Active' : 'Inactive',
+                            $product->created_at->format('Y-m-d H:i:s')
+                        ]);
+                    }
+
+                    fclose($file);
+                };
+
+                return response()->stream($callback, 200, $headers);
+            }
+
+            return back()->with('error', 'Export format not supported.');
+        } catch (\Exception $e) {
+            return back()->with('error', 'Failed to export products: ' . $e->getMessage());
         }
     }
 }

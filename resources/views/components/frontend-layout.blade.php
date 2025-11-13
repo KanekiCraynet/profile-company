@@ -37,7 +37,7 @@
 </head>
 <body class="font-sans antialiased bg-white dark:bg-neutral-900 text-neutral-900 dark:text-neutral-100 min-h-screen flex flex-col">
     <!-- Navigation -->
-    <x-navbar-simple />
+    <x-navbar />
 
     <!-- Main Content -->
     <main class="flex-grow pt-16 md:pt-20">
@@ -48,7 +48,7 @@
     <x-footer />
 
     <!-- Chatbot Widget -->
-    <x-chatbot-widget-simple />
+    <x-chatbot-widget />
 
     <!-- Scroll to Top Button -->
     <button 

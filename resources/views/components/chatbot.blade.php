@@ -3,94 +3,20 @@
     open: false,
     messages: [],
     isLoading: false,
-    inputText: '',
-
-    init() {
-        // Initialize with welcome message
-        this.messages.push({
-            type: 'bot',
-            text: 'Halo! Saya di sini untuk membantu Anda dengan informasi tentang produk dan layanan kami. Ada yang bisa saya bantu?',
-            time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
-        });
-    },
-
-    toggle() {
-        this.open = !this.open;
-        if (this.open) {
-            this.$nextTick(() => {
-                this.$refs.input?.focus();
-            });
-        }
-    },
-
-    async sendMessage() {
-        const message = this.inputText.trim();
-        if (!message || this.isLoading) return;
-
-        // Add user message
-        this.messages.push({
-            type: 'user',
-            text: message,
-            time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
-        });
-
-        this.inputText = '';
-        this.isLoading = true;
-
-        try {
-            const response = await fetch('/api/chatbot', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').getAttribute('content'),
-                    'X-Requested-With': 'XMLHttpRequest'
-                },
-                body: JSON.stringify({ message: message })
-            });
-
-            if (!response.ok) throw new Error('Network response was not ok');
-
-            const data = await response.json();
-
-            this.messages.push({
-                type: 'bot',
-                text: data.response || 'Maaf, terjadi kesalahan. Silakan coba lagi.',
-                time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
-            });
-
-        } catch (error) {
-            this.messages.push({
-                type: 'bot',
-                text: 'Maaf, saya tidak dapat terhubung ke server saat ini. Silakan coba lagi nanti.',
-                time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
-            });
-        } finally {
-            this.isLoading = false;
-            this.scrollToBottom();
-        }
-    },
-
-    scrollToBottom() {
-        this.$nextTick(() => {
-            const container = this.$refs.messagesContainer;
-            if (container) {
-                container.scrollTop = container.scrollHeight;
-            }
-        });
-    },
-
-    handleKeydown(event) {
-        if (event.key === 'Enter' && !event.shiftKey) {
-            event.preventDefault();
-            this.sendMessage();
-        }
-    }
+    inputText: ''
 }"
+x-init="
+    messages.push({
+        type: 'bot',
+        text: 'Halo! Saya di sini untuk membantu Anda dengan informasi tentang produk dan layanan kami. Ada yang bisa saya bantu?',
+        time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+    });
+"
 x-cloak
 class="fixed bottom-6 right-6 z-50">
 
     <!-- Chat Button -->
-    <button @click="toggle()"
+    <button @click="open = !open"
             class="bg-gradient-to-r from-primary-600 to-primary-700 hover:from-primary-700 hover:to-primary-800 text-white rounded-full w-16 h-16 md:w-20 md:h-20 flex items-center justify-center cursor-pointer shadow-2xl hover:shadow-primary-500/50 transform hover:scale-110 transition-all duration-300 pulse-ring relative"
             :class="{ 'animate-pulse': !open }"
             aria-label="Open chat">
@@ -229,13 +155,51 @@ class="fixed bottom-6 right-6 z-50">
             <div class="flex items-center space-x-2">
                 <input x-ref="input"
                        x-model="inputText"
-                       @keydown="handleKeydown($event)"
+                       @keydown.enter="if (inputText.trim() && !isLoading) {
+                           messages.push({
+                               type: 'user',
+                               text: inputText.trim(),
+                               time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                           });
+                           const userMsg = inputText.trim();
+                           inputText = '';
+                           isLoading = true;
+
+                           // Simulate bot response
+                           setTimeout(() => {
+                               isLoading = false;
+                               messages.push({
+                                   type: 'bot',
+                                   text: 'Terima kasih atas pesan Anda. Kami akan segera merespons.',
+                                   time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                               });
+                           }, 1000);
+                       }"
                        type="text"
                        placeholder="Ketik pesan Anda..."
                        :disabled="isLoading"
                        class="flex-1 px-4 py-3 bg-gray-50 dark:bg-neutral-700 border border-neutral-300 dark:border-neutral-600 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-primary-500 focus:border-transparent disabled:opacity-50 disabled:cursor-not-allowed">
 
-                <button @click="sendMessage()"
+                <button @click="if (inputText.trim() && !isLoading) {
+                           messages.push({
+                               type: 'user',
+                               text: inputText.trim(),
+                               time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                           });
+                           const userMsg = inputText.trim();
+                           inputText = '';
+                           isLoading = true;
+
+                           // Simulate bot response
+                           setTimeout(() => {
+                               isLoading = false;
+                               messages.push({
+                                   type: 'bot',
+                                   text: 'Terima kasih atas pesan Anda. Kami akan segera merespons.',
+                                   time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                               });
+                           }, 1000);
+                       }"
                         :disabled="isLoading || !inputText.trim()"
                         class="bg-primary-600 hover:bg-primary-700 disabled:bg-neutral-300 dark:disabled:bg-neutral-600 text-white p-3 rounded-xl transition-colors duration-200 disabled:cursor-not-allowed transform hover:scale-105 active:scale-95">
 
@@ -254,15 +218,60 @@ class="fixed bottom-6 right-6 z-50">
 
             <!-- Quick Actions -->
             <div class="flex flex-wrap gap-2 mt-3">
-                <button @click="inputText = 'Daftar produk'; sendMessage()"
+                <button @click="inputText = 'Daftar produk';
+                           messages.push({
+                               type: 'user',
+                               text: inputText,
+                               time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                           });
+                           inputText = '';
+                           isLoading = true;
+                           setTimeout(() => {
+                               isLoading = false;
+                               messages.push({
+                                   type: 'bot',
+                                   text: 'Berikut adalah daftar produk kami. Silakan kunjungi halaman produk untuk informasi lengkap.',
+                                   time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                               });
+                           }, 1000);"
                         class="text-xs px-3 py-1.5 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 rounded-full hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors">
                     📦 Daftar Produk
                 </button>
-                <button @click="inputText = 'Cara pemesanan'; sendMessage()"
+                <button @click="inputText = 'Cara pemesanan';
+                           messages.push({
+                               type: 'user',
+                               text: inputText,
+                               time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                           });
+                           inputText = '';
+                           isLoading = true;
+                           setTimeout(() => {
+                               isLoading = false;
+                               messages.push({
+                                   type: 'bot',
+                                   text: 'Untuk pemesanan, silakan hubungi kami melalui halaman kontak atau WhatsApp di (+62) 821-9698-146.',
+                                   time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                               });
+                           }, 1000);"
                         class="text-xs px-3 py-1.5 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 rounded-full hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors">
                     🛒 Cara Pemesanan
                 </button>
-                <button @click="inputText = 'Info sertifikasi'; sendMessage()"
+                <button @click="inputText = 'Info sertifikasi';
+                           messages.push({
+                               type: 'user',
+                               text: inputText,
+                               time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                           });
+                           inputText = '';
+                           isLoading = true;
+                           setTimeout(() => {
+                               isLoading = false;
+                               messages.push({
+                                   type: 'bot',
+                                   text: 'Semua produk kami telah tersertifikasi Halal MUI dan terdaftar di BPOM, menjamin kualitas dan keamanan.',
+                                   time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                               });
+                           }, 1000);"
                         class="text-xs px-3 py-1.5 bg-primary-50 dark:bg-primary-900/30 text-primary-700 dark:text-primary-400 rounded-full hover:bg-primary-100 dark:hover:bg-primary-900/50 transition-colors">
                     🏆 Sertifikasi
                 </button>

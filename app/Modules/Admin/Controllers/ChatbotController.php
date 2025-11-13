@@ -108,6 +108,7 @@ class ChatbotController extends Controller
      */
     public function history()
     {
+        // Allow users with 'view chatbot' permission OR Marketing role to access history
         $this->authorize('view chatbot');
 
         $histories = ChatHistory::with(['user', 'rule'])

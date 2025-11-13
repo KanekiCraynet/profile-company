@@ -1,20 +1,19 @@
 <div x-data="{
          open: false,
          messages: [],
-         isLoading: false,
-         init() {
-             // Initialize with welcome message when first opened
-             this.$watch('open', (value) => {
-                 if (value && this.messages.length === 0) {
-                     this.messages.push({
-                         type: 'bot',
-                         text: 'Halo! Saya di sini untuk membantu Anda dengan informasi tentang produk dan layanan kami. Ada yang bisa saya bantu?',
-                         time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
-                     });
-                 }
-             });
-         }
+         isLoading: false
      }"
+     x-init="
+         $watch('open', (value) => {
+             if (value && messages.length === 0) {
+                 messages.push({
+                     type: 'bot',
+                     text: 'Halo! Saya di sini untuk membantu Anda dengan informasi tentang produk dan layanan kami. Ada yang bisa saya bantu?',
+                     time: new Date().toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })
+                 });
+             }
+         });
+     "
      class="fixed bottom-6 right-6 z-50"
      id="chatbot-widget">
     

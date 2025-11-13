@@ -1,16 +1,14 @@
 <nav id="navbar"
      x-data="{
          open: false,
-         scrolled: false,
-         init() {
-             // Set initial scroll state
-             this.scrolled = window.pageYOffset > 50;
-             // Add scroll listener
-             window.addEventListener('scroll', () => {
-                 this.scrolled = window.pageYOffset > 50;
-             }, { passive: true });
-         }
+         scrolled: false
      }"
+     x-init="
+         scrolled = window.pageYOffset > 50;
+         window.addEventListener('scroll', () => {
+             scrolled = window.pageYOffset > 50;
+         }, { passive: true });
+     "
      :class="scrolled ? 'navbar-scrolled shadow-xl backdrop-blur-xl bg-white/98 dark:bg-neutral-900/98' : 'bg-white/80 dark:bg-neutral-900/80'"
      class="fixed top-0 left-0 right-0 backdrop-blur-lg border-b border-neutral-200/60 dark:border-neutral-800/60 z-50 transition-all duration-500 ease-out">
     <div class="container-custom max-w-7xl">

@@ -207,6 +207,365 @@ body {
     letter-spacing: 0.01em;
 }
 
+/* Modern Form Components */
+.modern-input,
+.modern-select,
+.modern-textarea {
+    @apply transition-all duration-200;
+    font-family: 'Inter', sans-serif;
+}
+
+.modern-input:focus,
+.modern-select:focus,
+.modern-textarea:focus {
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+.modern-input.error,
+.modern-select.error,
+.modern-textarea.error {
+    @apply border-red-500 bg-red-50;
+    box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+}
+
+.modern-input.success,
+.modern-select.success,
+.modern-textarea.success {
+    @apply border-green-500 bg-green-50;
+    box-shadow: 0 0 0 3px rgba(34, 197, 94, 0.1);
+}
+
+/* Modern Checkbox Styles */
+.modern-checkbox {
+    @apply transition-all duration-200;
+}
+
+.modern-checkbox:checked {
+    @apply bg-green-600 border-green-600;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 20 20' fill='white'%3E%3Cpath fill-rule='evenodd' d='M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z' clip-rule='evenodd'/%3E%3C/svg%3E");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: 1.25em 1.25em;
+}
+
+/* Loading Spinner Animation */
+@keyframes spin {
+    from {
+        transform: rotate(0deg);
+    }
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.animate-spin {
+    animation: spin 1s linear infinite;
+}
+
+/* Progress Bar */
+.progress-bar {
+    @apply w-full bg-gray-200 rounded-full h-2 overflow-hidden;
+}
+
+.progress-bar-fill {
+    @apply h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-300 ease-out;
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+}
+
+/* Toast Notification */
+.toast {
+    @apply fixed top-4 right-4 z-50 max-w-sm p-4 rounded-xl shadow-xl border transition-all duration-300 transform translate-x-full;
+}
+
+.toast.show {
+    @apply translate-x-0;
+}
+
+.toast.success {
+    @apply bg-green-50 border-green-200 text-green-800;
+}
+
+.toast.error {
+    @apply bg-red-50 border-red-200 text-red-800;
+}
+
+.toast.info {
+    @apply bg-blue-50 border-blue-200 text-blue-800;
+}
+
+.toast.warning {
+    @apply bg-yellow-50 border-yellow-200 text-yellow-800;
+}
+
+/* Modal */
+.modal-overlay {
+    @apply fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 transition-opacity duration-300;
+}
+
+.modal-content {
+    @apply bg-white rounded-2xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto transform transition-all duration-300 scale-95 opacity-0;
+}
+
+.modal-overlay.show .modal-content {
+    @apply scale-100 opacity-100;
+}
+
+/* Table Enhancements */
+.table-modern {
+    @apply w-full border-collapse bg-white rounded-xl overflow-hidden shadow-lg;
+}
+
+.table-modern thead {
+    @apply bg-gray-50 border-b border-gray-200;
+}
+
+.table-modern th {
+    @apply px-6 py-4 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider;
+}
+
+.table-modern tbody tr {
+    @apply border-b border-gray-100 hover:bg-gray-50 transition-colors;
+}
+
+.table-modern td {
+    @apply px-6 py-4 text-sm text-gray-900;
+}
+
+/* Badge Variants */
+.badge {
+    @apply inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold;
+}
+
+.badge-success {
+    @apply bg-green-100 text-green-800;
+}
+
+.badge-error {
+    @apply bg-red-100 text-red-800;
+}
+
+.badge-warning {
+    @apply bg-yellow-100 text-yellow-800;
+}
+
+.badge-info {
+    @apply bg-blue-100 text-blue-800;
+}
+
+/* Pulse Animation for Notifications */
+@keyframes pulse-once {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.animate-pulse-once {
+    animation: pulse-once 2s ease-in-out;
+}
+
+/* Drag and Drop Styles */
+.drag-zone {
+    @apply border-2 border-dashed border-gray-300 rounded-xl p-8 text-center transition-all duration-200;
+}
+
+.drag-zone.drag-over {
+    @apply border-green-400 bg-green-50;
+}
+
+.drag-zone.drag-active {
+    @apply border-green-500 bg-green-100 scale-[1.02];
+}
+
+/* Loading Skeleton Variants */
+.skeleton-text {
+    @apply h-4 bg-gray-200 rounded animate-pulse;
+}
+
+.skeleton-text.small {
+    @apply h-3 w-3/4;
+}
+
+.skeleton-text.medium {
+    @apply h-4 w-full;
+}
+
+.skeleton-text.large {
+    @apply h-5 w-5/6;
+}
+
+.skeleton-avatar {
+    @apply w-10 h-10 bg-gray-200 rounded-full animate-pulse;
+}
+
+.skeleton-button {
+    @apply h-10 w-24 bg-gray-200 rounded-lg animate-pulse;
+}
+
+/* Search Field Enhancement */
+.search-field {
+    @apply relative;
+}
+
+.search-field input {
+    @apply pl-10 pr-4 py-2.5 border border-gray-300 rounded-xl focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200;
+}
+
+.search-field-icon {
+    @apply absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none;
+}
+
+/* Enhanced Select with Custom Arrow */
+.custom-select {
+    @apply appearance-none bg-white border border-gray-300 rounded-xl px-4 py-2.5 pr-10 focus:ring-2 focus:ring-green-500 focus:border-transparent transition-all duration-200;
+}
+
+.custom-select-wrapper {
+    @apply relative;
+}
+
+.custom-select-arrow {
+    @apply absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 pointer-events-none;
+}
+
+/* Tooltip */
+.tooltip {
+    @apply relative;
+}
+
+.tooltip::before {
+    content: attr(data-tooltip);
+    @apply absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 px-2 py-1 text-xs text-white bg-gray-800 rounded whitespace-nowrap opacity-0 pointer-events-none transition-opacity duration-200 z-10;
+}
+
+.tooltip::after {
+    content: '';
+    @apply absolute bottom-full left-1/2 transform -translate-x-1/2 mb-0 border-4 border-transparent border-t-gray-800 opacity-0 pointer-events-none transition-opacity duration-200 z-10;
+}
+
+.tooltip:hover::before,
+.tooltip:hover::after {
+    @apply opacity-100;
+}
+
+/* File Upload Progress */
+.upload-progress {
+    @apply w-full bg-gray-200 rounded-full h-2 overflow-hidden;
+}
+
+.upload-progress-bar {
+    @apply h-full bg-gradient-to-r from-green-500 to-green-600 transition-all duration-300 ease-out;
+}
+
+.upload-item {
+    @apply flex items-center justify-between p-3 bg-gray-50 rounded-lg border border-gray-200;
+}
+
+.upload-item.success {
+    @apply bg-green-50 border-green-200;
+}
+
+.upload-item.error {
+    @apply bg-red-50 border-red-200;
+}
+
+/* Form Validation States */
+.form-group {
+    @apply mb-6;
+}
+
+.form-group.error label {
+    @apply text-red-600;
+}
+
+.form-group.error .modern-input,
+.form-group.error .modern-select,
+.form-group.error .modern-textarea {
+    @apply border-red-500 bg-red-50;
+}
+
+.form-group.success label {
+    @apply text-green-600;
+}
+
+.form-group.success .modern-input,
+.form-group.success .modern-select,
+.form-group.success .modern-textarea {
+    @apply border-green-500 bg-green-50;
+}
+
+.error-message {
+    @apply mt-2 text-sm text-red-600 flex items-start;
+}
+
+.success-message {
+    @apply mt-2 text-sm text-green-600 flex items-start;
+}
+
+.help-text {
+    @apply mt-1 text-xs text-gray-500;
+}
+
+/* Button States */
+.btn:disabled {
+    @apply opacity-50 cursor-not-allowed transform-none;
+}
+
+.btn.loading {
+    @apply pointer-events-none;
+}
+
+.btn-primary.loading {
+    background-image: linear-gradient(135deg, #059669 0%, #047857 100%);
+}
+
+/* Card Hover Effects */
+.card-hover-lift {
+    @apply transition-all duration-300 ease-out hover:transform hover:-translate-y-1 hover:shadow-xl;
+}
+
+.card-hover-scale {
+    @apply transition-all duration-300 ease-out hover:transform hover:scale-105 hover:shadow-xl;
+}
+
+/* Responsive Form Helpers */
+.form-grid {
+    @apply grid grid-cols-1 gap-6;
+}
+
+@media (min-width: 640px) {
+    .form-grid {
+        @apply grid-cols-2 gap-6;
+    }
+}
+
+@media (min-width: 1024px) {
+    .form-grid {
+        @apply grid-cols-3 gap-8;
+    }
+}
+
+/* Focus Management */
+.focus-trap {
+    @apply relative;
+}
+
+.focus-trap:focus-within {
+    @apply ring-2 ring-green-500 ring-offset-2 rounded-xl;
+}
+
+/* Loading Overlay */
+.loading-overlay {
+    @apply absolute inset-0 bg-white/80 flex items-center justify-center z-50 rounded-xl;
+}
+
+.loading-spinner {
+    @apply w-8 h-8 border-2 border-gray-200 border-t-green-600 rounded-full animate-spin;
+}
+
 .btn-primary {
     @apply bg-gradient-to-r from-primary-600 to-primary-700 text-white hover:from-primary-700 hover:to-primary-800 focus:ring-primary-500 shadow-lg hover:shadow-2xl hover:shadow-primary-500/30 transform hover:-translate-y-1 hover:scale-105 active:scale-100;
     border: none;

@@ -42,6 +42,7 @@ Route::middleware('auth')->group(function () {
         Route::middleware('role:Super Admin|Admin')->group(function () {
             Route::resource('products', \App\Modules\Admin\Controllers\ProductController::class);
             Route::delete('products/{product}/images/{mediaId}', [\App\Modules\Admin\Controllers\ProductController::class, 'removeImage'])->name('products.remove-image');
+            Route::get('products/export', [\App\Modules\Admin\Controllers\ProductController::class, 'export'])->name('products.export');
         });
 
         // Articles management (Super Admin, Admin, Marketing)
@@ -58,13 +59,11 @@ Route::middleware('auth')->group(function () {
         // Chatbot management (Super Admin, Admin)
         Route::middleware('role:Super Admin|Admin')->group(function () {
             Route::resource('chatbot', \App\Modules\Admin\Controllers\ChatbotController::class, ['except' => ['show']]);
-            Route::get('chatbot-history', [\App\Modules\Admin\Controllers\ChatbotController::class, 'history'])->name('chatbot.history');
         });
 
-        // Chatbot read-only access for Marketing
-        Route::middleware('role:Marketing')->group(function () {
-            Route::get('chatbot-history', [\App\Modules\Admin\Controllers\ChatbotController::class, 'history'])->name('chatbot.history');
-        });
+        // Chatbot history for all roles (Super Admin, Admin, Marketing)
+        Route::get('chatbot-history', [\App\Modules\Admin\Controllers\ChatbotController::class, 'history'])->name('chatbot.history')
+            ->middleware('role:Super Admin|Admin|Marketing');
 
         // Super Admin only routes
         Route::middleware('role:Super Admin')->group(function () {
