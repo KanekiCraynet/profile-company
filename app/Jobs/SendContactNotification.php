@@ -76,3 +76,4 @@ class SendContactNotification implements ShouldQueue
     }
 }
 
+

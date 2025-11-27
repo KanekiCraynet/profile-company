@@ -277,109 +277,152 @@
             </div>
 
             <nav class="space-y-1 pb-24" role="menubar" aria-label="Main navigation menu">
+                <!-- Menu Section Label -->
+                <div class="text-green-300/70 text-xs font-semibold uppercase tracking-wider px-4 py-2 mb-2">Main Menu</div>
+
                 <!-- Dashboard - All roles -->
                 <a href="{{ route('admin.dashboard') }}"
-                   class="sidebar-link group flex items-center py-3 px-4 rounded-xl hover:bg-white/10 transition-all duration-200 {{ request()->routeIs('admin.dashboard') ? 'bg-white/20 shadow-lg' : '' }}"
+                   class="sidebar-link group flex items-center py-3 px-4 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.dashboard') ? 'bg-white/20 shadow-lg text-white' : 'hover:bg-white/10 text-green-100' }}"
                    role="menuitem"
                    aria-current="{{ request()->routeIs('admin.dashboard') ? 'page' : 'false' }}">
-                    <i data-lucide="layout-dashboard" class="w-5 h-5 mr-3 text-green-200 group-hover:text-white transition-colors" aria-hidden="true"></i>
-                    <span class="font-medium">Dashboard</span>
-                    {{ request()->routeIs('admin.dashboard') ? '<i data-lucide="chevron-right" class="w-4 h-4 ml-auto" aria-hidden="true"></i>' : '' }}
+                    <div class="flex items-center justify-center w-9 h-9 rounded-lg {{ request()->routeIs('admin.dashboard') ? 'bg-white/20' : 'bg-white/5 group-hover:bg-white/10' }} transition-colors mr-3">
+                        <i data-lucide="layout-dashboard" class="w-5 h-5" aria-hidden="true"></i>
+                    </div>
+                    <span class="font-medium flex-1">Dashboard</span>
+                    @if(request()->routeIs('admin.dashboard'))
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-green-300" aria-hidden="true"></i>
+                    @endif
                 </a>
 
                 <!-- Products - Super Admin, Admin -->
                 @can('view products')
                 <a href="{{ route('admin.products.index') }}"
-                   class="sidebar-link group flex items-center py-3 px-4 rounded-xl hover:bg-green-600 transition-all duration-200 {{ request()->routeIs('admin.products.*') ? 'bg-green-600 shadow-lg' : '' }}">
-                    <i data-lucide="package" class="w-5 h-5 mr-3 text-green-200 group-hover:text-white transition-colors"></i>
-                    <span class="font-medium">Products</span>
-                    {{ request()->routeIs('admin.products.*') ? '<i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>' : '' }}
+                   class="sidebar-link group flex items-center py-3 px-4 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.products.*') ? 'bg-white/20 shadow-lg text-white' : 'hover:bg-white/10 text-green-100' }}">
+                    <div class="flex items-center justify-center w-9 h-9 rounded-lg {{ request()->routeIs('admin.products.*') ? 'bg-white/20' : 'bg-white/5 group-hover:bg-white/10' }} transition-colors mr-3">
+                        <i data-lucide="package" class="w-5 h-5"></i>
+                    </div>
+                    <span class="font-medium flex-1">Products</span>
+                    @if(request()->routeIs('admin.products.*'))
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-green-300"></i>
+                    @endif
                 </a>
                 @endcan
 
                 <!-- Articles - Super Admin, Admin, Marketing -->
                 @can('view articles')
                 <a href="{{ route('admin.articles.index') }}"
-                   class="sidebar-link group flex items-center py-3 px-4 rounded-xl hover:bg-green-600 transition-all duration-200 {{ request()->routeIs('admin.articles.*') ? 'bg-green-600 shadow-lg' : '' }}">
-                    <i data-lucide="file-text" class="w-5 h-5 mr-3 text-green-200 group-hover:text-white transition-colors"></i>
-                    <span class="font-medium">Articles</span>
-                    {{ request()->routeIs('admin.articles.*') ? '<i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>' : '' }}
+                   class="sidebar-link group flex items-center py-3 px-4 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.articles.*') ? 'bg-white/20 shadow-lg text-white' : 'hover:bg-white/10 text-green-100' }}">
+                    <div class="flex items-center justify-center w-9 h-9 rounded-lg {{ request()->routeIs('admin.articles.*') ? 'bg-white/20' : 'bg-white/5 group-hover:bg-white/10' }} transition-colors mr-3">
+                        <i data-lucide="file-text" class="w-5 h-5"></i>
+                    </div>
+                    <span class="font-medium flex-1">Articles</span>
+                    @if(request()->routeIs('admin.articles.*'))
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-green-300"></i>
+                    @endif
                 </a>
                 @endcan
 
                 <!-- Contacts - Super Admin, Admin -->
                 @can('view contacts')
+                @php
+                    $unreadCount = \App\Models\Contact::where('status', 'unread')->count();
+                @endphp
                 <a href="{{ route('admin.contacts.index') }}"
-                   class="sidebar-link group flex items-center py-3 px-4 rounded-xl hover:bg-green-600 transition-all duration-200 {{ request()->routeIs('admin.contacts.*') ? 'bg-green-600 shadow-lg' : '' }}">
-                    <div class="relative">
-                        <i data-lucide="mail" class="w-5 h-5 mr-3 text-green-200 group-hover:text-white transition-colors"></i>
-                        @php
-                            $unreadCount = \App\Models\Contact::where('status', 'unread')->count();
-                        @endphp
+                   class="sidebar-link group flex items-center py-3 px-4 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.contacts.*') ? 'bg-white/20 shadow-lg text-white' : 'hover:bg-white/10 text-green-100' }}">
+                    <div class="relative flex items-center justify-center w-9 h-9 rounded-lg {{ request()->routeIs('admin.contacts.*') ? 'bg-white/20' : 'bg-white/5 group-hover:bg-white/10' }} transition-colors mr-3">
+                        <i data-lucide="mail" class="w-5 h-5"></i>
                         @if($unreadCount > 0)
-                            <span class="absolute -top-1 -right-1 w-2 h-2 bg-red-500 rounded-full animate-pulse"></span>
+                            <span class="absolute -top-1 -right-1 w-3 h-3 bg-red-500 rounded-full border-2 border-green-700 animate-pulse"></span>
                         @endif
                     </div>
-                    <span class="font-medium">Contacts</span>
+                    <span class="font-medium flex-1">Contacts</span>
                     @if($unreadCount > 0)
-                        <span class="ml-auto bg-red-500 text-white text-xs px-2 py-1 rounded-full font-semibold animate-bounce">{{ $unreadCount }}</span>
+                        <span class="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full font-bold min-w-[20px] text-center">{{ $unreadCount }}</span>
+                    @elseif(request()->routeIs('admin.contacts.*'))
+                        <i data-lucide="chevron-right" class="w-4 h-4 text-green-300"></i>
                     @endif
                 </a>
                 @endcan
 
-                <!-- Chatbot - Super Admin, Admin, Marketing -->
+                <!-- Chatbot Section -->
                 @can('view chatbot')
-                <div class="space-y-1 mt-4">
-                    <div class="text-green-200 text-xs font-semibold uppercase tracking-wider px-4 py-2">Chatbot</div>
+                <div class="mt-6">
+                    <div class="text-green-300/70 text-xs font-semibold uppercase tracking-wider px-4 py-2 mb-2">Chatbot</div>
+                    
                     @can('create chatbot')
                     <a href="{{ route('admin.chatbot.index') }}"
-                       class="sidebar-link group flex items-center py-2.5 px-6 rounded-xl hover:bg-green-600 transition-all duration-200 {{ request()->routeIs('admin.chatbot.index') || request()->routeIs('admin.chatbot.create') || request()->routeIs('admin.chatbot.edit') ? 'bg-green-600 shadow-lg' : '' }}">
-                        <i data-lucide="bot" class="w-4 h-4 mr-3 text-green-200 group-hover:text-white transition-colors"></i>
-                        <span class="text-sm font-medium">Rules</span>
-                        {{ request()->routeIs('admin.chatbot.index') || request()->routeIs('admin.chatbot.create') || request()->routeIs('admin.chatbot.edit') ? '<i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>' : '' }}
+                       class="sidebar-link group flex items-center py-2.5 px-4 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.chatbot.index') || request()->routeIs('admin.chatbot.create') || request()->routeIs('admin.chatbot.edit') ? 'bg-white/20 shadow-lg text-white' : 'hover:bg-white/10 text-green-100' }}">
+                        <div class="flex items-center justify-center w-8 h-8 rounded-lg {{ request()->routeIs('admin.chatbot.index') || request()->routeIs('admin.chatbot.create') || request()->routeIs('admin.chatbot.edit') ? 'bg-white/20' : 'bg-white/5 group-hover:bg-white/10' }} transition-colors mr-3">
+                            <i data-lucide="bot" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-sm font-medium flex-1">Rules</span>
+                        @if(request()->routeIs('admin.chatbot.index') || request()->routeIs('admin.chatbot.create') || request()->routeIs('admin.chatbot.edit'))
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-green-300"></i>
+                        @endif
                     </a>
                     @endcan
+                    
                     <a href="{{ route('admin.chatbot.history') }}"
-                       class="sidebar-link group flex items-center py-2.5 px-6 rounded-xl hover:bg-green-600 transition-all duration-200 {{ request()->routeIs('admin.chatbot.history') ? 'bg-green-600 shadow-lg' : '' }}">
-                        <i data-lucide="history" class="w-4 h-4 mr-3 text-green-200 group-hover:text-white transition-colors"></i>
-                        <span class="text-sm font-medium">History</span>
-                        {{ request()->routeIs('admin.chatbot.history') ? '<i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>' : '' }}
+                       class="sidebar-link group flex items-center py-2.5 px-4 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.chatbot.history') ? 'bg-white/20 shadow-lg text-white' : 'hover:bg-white/10 text-green-100' }}">
+                        <div class="flex items-center justify-center w-8 h-8 rounded-lg {{ request()->routeIs('admin.chatbot.history') ? 'bg-white/20' : 'bg-white/5 group-hover:bg-white/10' }} transition-colors mr-3">
+                            <i data-lucide="history" class="w-4 h-4"></i>
+                        </div>
+                        <span class="text-sm font-medium flex-1">History</span>
+                        @if(request()->routeIs('admin.chatbot.history'))
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-green-300"></i>
+                        @endif
                     </a>
                 </div>
                 @endcan
 
-                <!-- Divider -->
-                <div class="border-t border-green-600/30 my-4"></div>
+                <!-- Administration Section -->
+                @canany(['view users', 'view roles', 'view settings'])
+                <div class="mt-6">
+                    <div class="text-green-300/70 text-xs font-semibold uppercase tracking-wider px-4 py-2 mb-2">Administration</div>
 
-                <!-- Users - Super Admin Only -->
-                @can('view users')
-                <a href="{{ route('admin.users.index') }}"
-                   class="sidebar-link group flex items-center py-3 px-4 rounded-xl hover:bg-green-600 transition-all duration-200 {{ request()->routeIs('admin.users.*') ? 'bg-green-600 shadow-lg' : '' }}">
-                    <i data-lucide="users" class="w-5 h-5 mr-3 text-green-200 group-hover:text-white transition-colors"></i>
-                    <span class="font-medium">Users</span>
-                    {{ request()->routeIs('admin.users.*') ? '<i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>' : '' }}
-                </a>
-                @endcan
+                    <!-- Users - Super Admin Only -->
+                    @can('view users')
+                    <a href="{{ route('admin.users.index') }}"
+                       class="sidebar-link group flex items-center py-3 px-4 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.users.*') ? 'bg-white/20 shadow-lg text-white' : 'hover:bg-white/10 text-green-100' }}">
+                        <div class="flex items-center justify-center w-9 h-9 rounded-lg {{ request()->routeIs('admin.users.*') ? 'bg-white/20' : 'bg-white/5 group-hover:bg-white/10' }} transition-colors mr-3">
+                            <i data-lucide="users" class="w-5 h-5"></i>
+                        </div>
+                        <span class="font-medium flex-1">Users</span>
+                        @if(request()->routeIs('admin.users.*'))
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-green-300"></i>
+                        @endif
+                    </a>
+                    @endcan
 
-                <!-- Roles & Permissions - Super Admin Only -->
-                @can('view roles')
-                <a href="{{ route('admin.roles.index') }}"
-                   class="sidebar-link group flex items-center py-3 px-4 rounded-xl hover:bg-green-600 transition-all duration-200 {{ request()->routeIs('admin.roles.*') ? 'bg-green-600 shadow-lg' : '' }}">
-                    <i data-lucide="shield-check" class="w-5 h-5 mr-3 text-green-200 group-hover:text-white transition-colors"></i>
-                    <span class="font-medium">Roles & Permissions</span>
-                    {{ request()->routeIs('admin.roles.*') ? '<i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>' : '' }}
-                </a>
-                @endcan
+                    <!-- Roles & Permissions - Super Admin Only -->
+                    @can('view roles')
+                    <a href="{{ route('admin.roles.index') }}"
+                       class="sidebar-link group flex items-center py-3 px-4 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.roles.*') ? 'bg-white/20 shadow-lg text-white' : 'hover:bg-white/10 text-green-100' }}">
+                        <div class="flex items-center justify-center w-9 h-9 rounded-lg {{ request()->routeIs('admin.roles.*') ? 'bg-white/20' : 'bg-white/5 group-hover:bg-white/10' }} transition-colors mr-3">
+                            <i data-lucide="shield-check" class="w-5 h-5"></i>
+                        </div>
+                        <span class="font-medium flex-1">Roles</span>
+                        @if(request()->routeIs('admin.roles.*'))
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-green-300"></i>
+                        @endif
+                    </a>
+                    @endcan
 
-                <!-- Settings - Super Admin Only -->
-                @can('view settings')
-                <a href="{{ route('admin.settings.index') }}"
-                   class="sidebar-link group flex items-center py-3 px-4 rounded-xl hover:bg-green-600 transition-all duration-200 {{ request()->routeIs('admin.settings.*') ? 'bg-green-600 shadow-lg' : '' }}">
-                    <i data-lucide="settings" class="w-5 h-5 mr-3 text-green-200 group-hover:text-white transition-colors"></i>
-                    <span class="font-medium">Settings</span>
-                    {{ request()->routeIs('admin.settings.*') ? '<i data-lucide="chevron-right" class="w-4 h-4 ml-auto"></i>' : '' }}
-                </a>
-                @endcan
+                    <!-- Settings - Super Admin Only -->
+                    @can('view settings')
+                    <a href="{{ route('admin.settings.index') }}"
+                       class="sidebar-link group flex items-center py-3 px-4 rounded-xl transition-all duration-200 {{ request()->routeIs('admin.settings.*') ? 'bg-white/20 shadow-lg text-white' : 'hover:bg-white/10 text-green-100' }}">
+                        <div class="flex items-center justify-center w-9 h-9 rounded-lg {{ request()->routeIs('admin.settings.*') ? 'bg-white/20' : 'bg-white/5 group-hover:bg-white/10' }} transition-colors mr-3">
+                            <i data-lucide="settings" class="w-5 h-5"></i>
+                        </div>
+                        <span class="font-medium flex-1">Settings</span>
+                        @if(request()->routeIs('admin.settings.*'))
+                            <i data-lucide="chevron-right" class="w-4 h-4 text-green-300"></i>
+                        @endif
+                    </a>
+                    @endcan
+                </div>
+                @endcanany
             </nav>
 
             <!-- Enhanced User Info -->

@@ -19,6 +19,8 @@ Route::get('/articles/{slug}', [ArticlesController::class, 'show'])->name('artic
 Route::get('/about', [PagesController::class, 'about'])->name('about');
 Route::get('/contact', [PagesController::class, 'contact'])->name('contact');
 Route::post('/contact', [PagesController::class, 'storeContact'])->name('contact.store');
+Route::get('/privacy-policy', [PagesController::class, 'privacyPolicy'])->name('privacy-policy');
+Route::get('/terms-conditions', [PagesController::class, 'termsConditions'])->name('terms-conditions');
 
 // Chatbot API route (public, but needs session for tracking)
 Route::post('/chatbot/message', [ChatbotController::class, 'handleMessage'])->name('chatbot.message');
@@ -40,9 +42,10 @@ Route::middleware('auth')->group(function () {
 
         // Products management (Super Admin, Admin)
         Route::middleware('role:Super Admin|Admin')->group(function () {
+            // Export route MUST be defined BEFORE resource route to avoid conflict with {product} parameter
+            Route::get('products/export', [\App\Modules\Admin\Controllers\ProductController::class, 'export'])->name('products.export');
             Route::resource('products', \App\Modules\Admin\Controllers\ProductController::class);
             Route::delete('products/{product}/images/{mediaId}', [\App\Modules\Admin\Controllers\ProductController::class, 'removeImage'])->name('products.remove-image');
-            Route::get('products/export', [\App\Modules\Admin\Controllers\ProductController::class, 'export'])->name('products.export');
         });
 
         // Articles management (Super Admin, Admin, Marketing)

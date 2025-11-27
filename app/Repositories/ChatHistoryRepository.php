@@ -14,11 +14,6 @@ class ChatHistoryRepository extends BaseRepository
     const ANALYTICS_CACHE_TTL = 900;
 
     /**
-     * Cache tags for chat history.
-     */
-    const CACHE_TAGS = ['chat_history'];
-
-    /**
      * Create a new repository instance.
      */
     public function __construct(ChatHistory $model)
@@ -36,7 +31,7 @@ class ChatHistoryRepository extends BaseRepository
     {
         $cacheKey = "chat_history:session:{$sessionId}";
         
-        return Cache::tags(self::CACHE_TAGS)->remember(
+        return Cache::remember(
             $cacheKey,
             300, // 5 minutes cache
             function () use ($sessionId) {
@@ -74,7 +69,7 @@ class ChatHistoryRepository extends BaseRepository
         $startDate = now()->subDays($days);
         $cacheKey = "chat_history:analytics:{$days}:" . $startDate->format('Y-m-d');
         
-        return Cache::tags(self::CACHE_TAGS)->remember(
+        return Cache::remember(
             $cacheKey,
             self::ANALYTICS_CACHE_TTL,
             function () use ($startDate) {
@@ -136,7 +131,11 @@ class ChatHistoryRepository extends BaseRepository
      */
     public function clearCache(): void
     {
-        Cache::tags(self::CACHE_TAGS)->flush();
+        // Clear analytics cache for common day ranges
+        foreach ([7, 14, 30, 60, 90] as $days) {
+            $startDate = now()->subDays($days);
+            Cache::forget("chat_history:analytics:{$days}:" . $startDate->format('Y-m-d'));
+        }
     }
 
     /**
@@ -148,7 +147,7 @@ class ChatHistoryRepository extends BaseRepository
     public function clearSessionCache(string $sessionId): void
     {
         $cacheKey = "chat_history:session:{$sessionId}";
-        Cache::tags(self::CACHE_TAGS)->forget($cacheKey);
+        Cache::forget($cacheKey);
     }
 }
 

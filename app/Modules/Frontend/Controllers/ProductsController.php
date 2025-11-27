@@ -21,49 +21,51 @@ class ProductsController extends Controller
      */
     public function index(Request $request)
     {
-        $cacheKey = 'products.index.' . md5(json_encode($request->all()));
-        
-        $data = Cache::remember($cacheKey, 1800, function () use ($request) {
-            $query = \App\Models\Product::with(['category', 'media'])
-                ->where('is_active', true);
-
-            // Filter by category
-            if ($request->filled('category')) {
-                $query->where('product_category_id', $request->category);
-            }
-
-            // Search functionality
-            if ($request->filled('search')) {
-                $searchTerm = $request->search;
-                $query->where(function ($q) use ($searchTerm) {
-                    $q->where('name', 'like', '%' . $searchTerm . '%')
-                      ->orWhere('description', 'like', '%' . $searchTerm . '%');
-                });
-            }
-
-            // Sort options
-            $sortBy = $request->get('sort', 'name');
-            $sortDirection = $request->get('direction', 'asc');
-
-            switch ($sortBy) {
-                case 'name':
-                    $query->orderBy('name', $sortDirection);
-                    break;
-                case 'price':
-                    $query->orderBy('price', $sortDirection);
-                    break;
-                case 'created':
-                    $query->orderBy('created_at', $sortDirection);
-                    break;
-                default:
-                    $query->orderBy('name', 'asc');
-            }
-
-            return [
-                'products' => $query->paginate(12),
-                'categories' => ProductCategory::where('is_active', true)->orderBy('name')->get(),
-            ];
+        // Cache categories separately (they change less frequently)
+        $categories = Cache::remember('products.categories.active', 3600, function () {
+            return ProductCategory::where('is_active', true)->orderBy('name')->get();
         });
+
+        // Build query for products (don't cache pagination results to avoid stale data)
+        $query = \App\Models\Product::with(['category', 'media'])
+            ->where('is_active', true);
+
+        // Filter by category
+        if ($request->filled('category')) {
+            $query->where('product_category_id', $request->category);
+        }
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('description', 'like', '%' . $searchTerm . '%');
+            });
+        }
+
+        // Sort options
+        $sortBy = $request->get('sort', 'name');
+        $sortDirection = $request->get('direction', 'asc');
+
+        switch ($sortBy) {
+            case 'name':
+                $query->orderBy('name', $sortDirection);
+                break;
+            case 'price':
+                $query->orderBy('price', $sortDirection);
+                break;
+            case 'created':
+                $query->orderBy('created_at', $sortDirection);
+                break;
+            default:
+                $query->orderBy('name', 'asc');
+        }
+
+        $data = [
+            'products' => $query->paginate(12)->withQueryString(),
+            'categories' => $categories,
+        ];
 
         // SEO Meta Tags
         $seoMeta = [

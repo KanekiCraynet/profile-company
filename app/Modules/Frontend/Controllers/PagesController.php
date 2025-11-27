@@ -89,4 +89,30 @@ class PagesController extends Controller
             return back()->withErrors(['message' => $e->getMessage()]);
         }
     }
+
+    public function privacyPolicy()
+    {
+        $seoMeta = [
+            'title' => 'Kebijakan Privasi - PT Lestari Jaya Bangsa',
+            'description' => 'Kebijakan privasi PT Lestari Jaya Bangsa menjelaskan bagaimana kami mengumpulkan, menggunakan, dan melindungi informasi pribadi Anda.',
+            'keywords' => 'kebijakan privasi, privacy policy, data pribadi, PT Lestari Jaya Bangsa',
+        ];
+
+        View::share('seoMeta', $seoMeta);
+
+        return view('frontend.pages.privacy-policy');
+    }
+
+    public function termsConditions()
+    {
+        $seoMeta = [
+            'title' => 'Syarat & Ketentuan - PT Lestari Jaya Bangsa',
+            'description' => 'Syarat dan ketentuan penggunaan layanan PT Lestari Jaya Bangsa. Harap baca dengan seksama sebelum menggunakan layanan kami.',
+            'keywords' => 'syarat ketentuan, terms conditions, peraturan, PT Lestari Jaya Bangsa',
+        ];
+
+        View::share('seoMeta', $seoMeta);
+
+        return view('frontend.pages.terms-conditions');
+    }
 }

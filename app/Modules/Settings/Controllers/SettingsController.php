@@ -5,6 +5,7 @@ namespace App\Modules\Settings\Controllers;
 use App\Http\Controllers\Controller;
 use App\Models\Setting;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Cache;
 
 class SettingsController extends Controller
 {
@@ -33,11 +34,38 @@ class SettingsController extends Controller
             Setting::set($key, $value ?? '', 'string');
         }
 
-        // Clear cache
-        \Cache::flush();
+        // Clear specific caches instead of flushing everything
+        $this->clearSettingsRelatedCache();
 
         return redirect()->route('admin.settings.index')
             ->with('success', 'Settings updated successfully.');
+    }
+
+    /**
+     * Clear settings-related cache selectively.
+     */
+    protected function clearSettingsRelatedCache(): void
+    {
+        // Clear settings cache
+        Cache::forget('settings');
+        Cache::forget('settings.all');
+        
+        // Clear homepage content cache (may use settings)
+        Cache::forget('homepage.content');
+        
+        // Clear dashboard stats cache
+        Cache::forget('superadmin_dashboard_stats');
+        Cache::forget('admin_dashboard_stats');
+        
+        // Try to clear tagged caches if driver supports it
+        try {
+            $driver = config('cache.default');
+            if (in_array($driver, ['redis', 'memcached', 'dynamodb'])) {
+                Cache::tags(['settings'])->flush();
+            }
+        } catch (\BadMethodCallException $e) {
+            // Cache driver doesn't support tags, continue
+        }
     }
 
     /**
@@ -69,6 +97,7 @@ class SettingsController extends Controller
             ->with('success', 'Setting deleted successfully.');
     }
 }
+
 
 
 

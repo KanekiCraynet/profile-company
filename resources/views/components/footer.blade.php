@@ -177,11 +177,11 @@
                     &copy; {{ date('Y') }} PT Lestari Jaya Bangsa. All rights reserved.
                 </p>
                 <div class="flex items-center space-x-6">
-                    <a href="#" class="text-primary-200 hover:text-white transition-colors duration-300 text-sm font-medium hover:underline">
+                    <a href="{{ route('privacy-policy') }}" class="text-primary-200 hover:text-white transition-colors duration-300 text-sm font-medium hover:underline">
                         Kebijakan Privasi
                     </a>
                     <span class="text-primary-700">|</span>
-                    <a href="#" class="text-primary-200 hover:text-white transition-colors duration-300 text-sm font-medium hover:underline">
+                    <a href="{{ route('terms-conditions') }}" class="text-primary-200 hover:text-white transition-colors duration-300 text-sm font-medium hover:underline">
                         Syarat & Ketentuan
                     </a>
                 </div>

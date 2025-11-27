@@ -160,8 +160,7 @@ class ArticleService
      */
     public function incrementViews(Article $article): void
     {
-        // View count tracking disabled - column not available in database
-        // $article->increment('view_count');
+        $article->increment('view_count');
         $this->forget("article.slug.{$article->slug}");
     }
 

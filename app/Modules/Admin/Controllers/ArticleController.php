@@ -19,6 +19,8 @@ class ArticleController extends Controller
 
     public function index(Request $request)
     {
+        $this->authorize('view articles');
+
         $filters = [
             'search' => $request->input('search'),
             'status' => $request->input('status'),
@@ -33,6 +35,8 @@ class ArticleController extends Controller
 
     public function create()
     {
+        $this->authorize('create articles');
+
         $categories = ArticleCategory::all();
         $tags = ArticleTag::all();
         return view('admin.articles.create', compact('categories', 'tags'));
@@ -44,9 +48,7 @@ class ArticleController extends Controller
             $data = $request->validated();
             
             // Normalize category_id field name
-            if (isset($data['category_id'])) {
-                $data['category_id'] = $data['category_id'];
-            } elseif (isset($data['article_category_id'])) {
+            if (isset($data['article_category_id'])) {
                 $data['category_id'] = $data['article_category_id'];
                 unset($data['article_category_id']);
             }
@@ -69,12 +71,16 @@ class ArticleController extends Controller
 
     public function show(Article $article)
     {
+        $this->authorize('view articles');
+
         $article->load(['category', 'author', 'tags']);
         return view('admin.articles.show', compact('article'));
     }
 
     public function edit(Article $article)
     {
+        $this->authorize('edit articles');
+
         $categories = ArticleCategory::all();
         $tags = ArticleTag::all();
         $article->load('tags');
@@ -87,9 +93,7 @@ class ArticleController extends Controller
             $data = $request->validated();
             
             // Normalize category_id field name
-            if (isset($data['category_id'])) {
-                $data['category_id'] = $data['category_id'];
-            } elseif (isset($data['article_category_id'])) {
+            if (isset($data['article_category_id'])) {
                 $data['category_id'] = $data['article_category_id'];
                 unset($data['article_category_id']);
             }
@@ -112,6 +116,8 @@ class ArticleController extends Controller
 
     public function destroy(Article $article)
     {
+        $this->authorize('delete articles');
+
         try {
             $this->articleService->delete($article->id, true);
 

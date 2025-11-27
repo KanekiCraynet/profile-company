@@ -46,7 +46,7 @@
             <div class="flex items-center justify-between">
                 <div>
                     <p class="text-sm font-medium text-gray-600">Categories</p>
-                    <p class="text-2xl font-bold text-yellow-600">{{ \App\Models\Category::count() ?? 0 }}</p>
+                    <p class="text-2xl font-bold text-yellow-600">{{ \App\Models\ProductCategory::count() ?? 0 }}</p>
                 </div>
                 <div class="p-3 bg-yellow-100 rounded-xl">
                     <i data-lucide="folder" class="w-6 h-6 text-yellow-600"></i>
@@ -88,7 +88,7 @@
                     <div class="flex gap-2">
                         <select id="categoryFilter" class="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm">
                             <option value="">All Categories</option>
-                            @foreach(\App\Models\Category::all() as $category)
+                            @foreach(\App\Models\ProductCategory::all() as $category)
                                 <option value="{{ $category->id }}">{{ $category->name }}</option>
                             @endforeach
                         </select>

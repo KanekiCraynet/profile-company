@@ -18,11 +18,6 @@ class ChatbotRuleRepository extends BaseRepository
     const CACHE_TTL = 3600;
 
     /**
-     * Cache tags for chatbot rules.
-     */
-    const CACHE_TAGS = ['chatbot_rules'];
-
-    /**
      * Create a new repository instance.
      */
     public function __construct(ChatbotRule $model)
@@ -37,7 +32,7 @@ class ChatbotRuleRepository extends BaseRepository
      */
     public function getActiveRules()
     {
-        return Cache::tags(self::CACHE_TAGS)->remember(
+        return Cache::remember(
             self::CACHE_KEY_ACTIVE_RULES,
             self::CACHE_TTL,
             function () {
@@ -139,7 +134,7 @@ class ChatbotRuleRepository extends BaseRepository
      */
     public function clearCache(): void
     {
-        Cache::tags(self::CACHE_TAGS)->flush();
+        Cache::forget(self::CACHE_KEY_ACTIVE_RULES);
     }
 
     /**

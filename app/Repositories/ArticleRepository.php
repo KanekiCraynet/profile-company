@@ -22,6 +22,7 @@ class ArticleRepository extends BaseRepository
     public function getPublishedArticles()
     {
         return $this->newQuery()
+            ->with(['category', 'author'])
             ->where('is_published', true)
             ->where('published_at', '<=', now())
             ->orderBy('published_at', 'desc')
@@ -37,6 +38,7 @@ class ArticleRepository extends BaseRepository
     public function findBySlug(string $slug)
     {
         return $this->newQuery()
+            ->with(['category', 'author', 'tags'])
             ->where('slug', $slug)
             ->where('is_published', true)
             ->where('published_at', '<=', now())
@@ -52,6 +54,7 @@ class ArticleRepository extends BaseRepository
     public function getFeaturedArticles(int $limit = 3)
     {
         return $this->newQuery()
+            ->with(['category', 'author'])
             ->where('is_published', true)
             ->where('featured', true)
             ->where('published_at', '<=', now())
@@ -69,6 +72,7 @@ class ArticleRepository extends BaseRepository
     public function getLatestArticles(int $limit = 6)
     {
         return $this->newQuery()
+            ->with(['category', 'author'])
             ->where('is_published', true)
             ->where('published_at', '<=', now())
             ->orderBy('published_at', 'desc')
@@ -85,6 +89,7 @@ class ArticleRepository extends BaseRepository
     public function getByCategory(int $categoryId)
     {
         return $this->newQuery()
+            ->with(['category', 'author'])
             ->where('category_id', $categoryId)
             ->where('is_published', true)
             ->where('published_at', '<=', now())
@@ -104,6 +109,7 @@ class ArticleRepository extends BaseRepository
     public function getRelatedArticles(int $articleId, int $categoryId, array $tagIds = [], int $limit = 4)
     {
         $query = $this->newQuery()
+            ->with(['category', 'author'])
             ->where('id', '!=', $articleId)
             ->where('is_published', true)
             ->where('published_at', '<=', now());

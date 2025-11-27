@@ -18,38 +18,40 @@ class ArticlesController extends Controller
 
     public function index(Request $request)
     {
-        $cacheKey = 'articles.index.' . md5(json_encode($request->all()));
-        
-        $data = Cache::remember($cacheKey, 1800, function () use ($request) {
-            $query = \App\Models\Article::with(['category', 'author'])
-                ->where('is_published', true)
-                ->where('published_at', '<=', now());
-
-            // Filter by category
-            if ($request->filled('category')) {
-                $query->where('category_id', $request->category);
-            }
-
-            // Search functionality
-            if ($request->filled('search')) {
-                $searchTerm = $request->search;
-                $query->where(function ($q) use ($searchTerm) {
-                    $q->where('title', 'like', '%' . $searchTerm . '%')
-                      ->orWhere('content', 'like', '%' . $searchTerm . '%')
-                      ->orWhere('excerpt', 'like', '%' . $searchTerm . '%');
-                });
-            }
-
-            // Filter by tag (if tags are stored as array)
-            if ($request->filled('tag')) {
-                $query->whereJsonContains('tags', $request->tag);
-            }
-
-            return [
-                'articles' => $query->orderBy('published_at', 'desc')->paginate(9),
-                'categories' => ArticleCategory::all(),
-            ];
+        // Cache categories separately (they change less frequently)
+        $categories = Cache::remember('articles.categories.all', 3600, function () {
+            return ArticleCategory::all();
         });
+
+        // Build query for articles (don't cache pagination results to avoid stale data)
+        $query = \App\Models\Article::with(['category', 'author'])
+            ->where('is_published', true)
+            ->where('published_at', '<=', now());
+
+        // Filter by category
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->category);
+        }
+
+        // Search functionality
+        if ($request->filled('search')) {
+            $searchTerm = $request->search;
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('title', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('content', 'like', '%' . $searchTerm . '%')
+                  ->orWhere('excerpt', 'like', '%' . $searchTerm . '%');
+            });
+        }
+
+        // Filter by tag (if tags are stored as array)
+        if ($request->filled('tag')) {
+            $query->whereJsonContains('tags', $request->tag);
+        }
+
+        $data = [
+            'articles' => $query->orderBy('published_at', 'desc')->paginate(9)->withQueryString(),
+            'categories' => $categories,
+        ];
 
         // SEO Meta Tags
         $seoMeta = [

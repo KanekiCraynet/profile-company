@@ -69,6 +69,8 @@ class ChatbotController extends Controller
                 'response' => $result['response'],
                 'session_id' => $result['session_id'],
                 'timestamp' => $result['timestamp'] ?? now()->toISOString(),
+                'type' => $result['type'] ?? 'text',
+                'extra' => $result['extra'] ?? [],
             ]);
 
         } catch (\Exception $e) {
