@@ -722,9 +722,9 @@ img.loaded {
     overflow: hidden;
 }
 
-/* Scroll to top button */
+/* Scroll to top button - positioned left of chatbot */
 .scroll-top {
-    @apply fixed bottom-8 right-8 z-50 p-4 bg-gradient-to-br from-primary-600 to-primary-700 text-white rounded-2xl shadow-xl hover:shadow-2xl hover:shadow-primary-500/50 transition-all duration-300 transform hover:scale-110 hover:-translate-y-1 opacity-0 invisible;
+    @apply fixed bottom-6 right-24 md:right-28 z-40 p-3 md:p-4 bg-gradient-to-br from-neutral-700 to-neutral-800 text-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 transform hover:scale-110 hover:-translate-y-1 opacity-0 invisible;
 }
 
 .scroll-top.visible {
@@ -733,6 +733,10 @@ img.loaded {
 
 .scroll-top:active {
     @apply scale-95;
+}
+
+.scroll-top:hover {
+    @apply from-primary-600 to-primary-700;
 }
 
 /* Loading States & Skeletons */
